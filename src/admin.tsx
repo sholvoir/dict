@@ -127,23 +127,22 @@ export default () => {
    const handleProcessIssueClick = async () => {
       const issue = issues()[currentIssueIndex()];
       if (!issue) return;
-      const result = (await srv.deleteIssue(issue._id!)) as any;
-      if (result.acknowledged && result.deletedCount > 0) {
-         setIssues((issues) =>
-            issues.filter((_, i) => i !== currentIssueIndex()),
-         );
-         if (issues().length && currentIssueIndex() >= issues().length)
-            setCurrentIssueIndex(issues().length - 1);
-         if (issues().length) handleIssueClick();
-         else {
-            setWord("");
-            setCurrentWord("_");
-            setEntries([]);
-            setCurrentCardIndex(0);
-            handleLoadIssueClick();
-         }
-         showTips("处理成功!");
-      } else showTips("处理失败");
+      const result = await srv.deleteIssue(issue._id!);
+      if (!result) return showTips("处理失败");
+      if (!result.acknowledged || result.deletedCount === 0)
+         return showTips("处理失败");
+      setIssues((issues) => issues.filter((_, i) => i !== currentIssueIndex()));
+      if (issues().length && currentIssueIndex() >= issues().length)
+         setCurrentIssueIndex(issues().length - 1);
+      if (issues().length) handleIssueClick();
+      else {
+         setWord("");
+         setCurrentWord("_");
+         setEntries([]);
+         setCurrentCardIndex(0);
+         handleLoadIssueClick();
+      }
+      showTips("处理成功!");
    };
    createResource(async () => {
       const vocab = await srv.getVocabulary();
