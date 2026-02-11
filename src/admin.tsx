@@ -69,7 +69,7 @@ export default () => {
       window.focus();
    };
    const handleAddCardClick = async () => {
-      const dict = (await srv.getDict(word())) as IDict;
+      const dict = (await srv.getDict(word(), true)) as IDict;
       if (dict) setEntries([...entries(), createSignal(dict.entries?.[0]!)]);
    };
    const handleDeleteCardClick = () => {

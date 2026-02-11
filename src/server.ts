@@ -16,8 +16,10 @@ export const deleteIssue = async (id: string) =>
       },
    );
 
-export const getDict = (word: string) =>
-   getJson<IDict>(url(`${API_BASE}/dict`, { q: word, mic: "1" }));
+export const getDict = (word: string, re?: true) =>
+   getJson<IDict>(
+      url(`${API_BASE}/dict`, { q: word, mic: "1", re: re ? "1" : undefined }),
+   );
 
 export const putDict = (dict: IDict) =>
    fetch(`${API_BASE}/dict`, {
