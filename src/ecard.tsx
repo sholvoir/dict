@@ -28,6 +28,16 @@ export default (
          setParseError(true);
       }
    };
+   const handleTTClick = () => {
+      const meanings: Record<string, string[]> = {};
+      if (entry().meanings)
+         for (const [pos, means] of Object.entries(entry().meanings!)) {
+            if (pos !== "ecdict")
+               meanings[pos] = means.map((m) => `${m} <tt></tt>`);
+            else meanings[pos] = means;
+         }
+      setEntry((en) => ({ ...en, meanings }));
+   };
    return (
       <div
          class={`flex flex-col h-full gap-2 ${props.class ?? ""}`}
@@ -54,6 +64,9 @@ export default (
                }
                onFocus={props.onClick}
             />
+            <Button class="button btn-normal" onClick={handleTTClick}>
+               TT
+            </Button>
             <Button
                class="button btn-normal"
                onClick={() =>
