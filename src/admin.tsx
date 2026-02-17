@@ -144,6 +144,12 @@ export default () => {
       }
       showTips("处理成功!");
    };
+   const handleOriginClick = () => {
+      window.open(
+         `https://dict.micinfotech.com/api/v2/dict?q=${word()}`,
+         "dict",
+      );
+   };
    createResource(async () => {
       const vocab = await srv.getVocabulary();
       if (vocab) setVocabulary(new Set(vocab.words));
@@ -180,6 +186,9 @@ export default () => {
                   options={vocabulary()}
                   onChange={handleSearchClick}
                />
+               <Button class="button btn-normal" onClick={handleOriginClick}>
+                  Origin
+               </Button>
                <Button
                   class="button btn-normal"
                   disabled={!word()}

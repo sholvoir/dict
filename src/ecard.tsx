@@ -38,12 +38,6 @@ export default (
          }
       setEntry((en) => ({ ...en, meanings }));
    };
-   const handleOriginClick = () => {
-      window.open(
-         `https://dict.micinfotech.com/api/v2/dict?q=${props.word}`,
-         "dict",
-      );
-   };
    return (
       <div
          class={`flex flex-col h-full gap-2 ${props.class ?? ""}`}
@@ -90,9 +84,6 @@ export default (
                disabled={!entry().sound}
             >
                <span class="text-[150%] align-bottom icon--material-symbols icon--material-symbols--chevron-right" />
-            </Button>
-            <Button class="button btn-normal" onClick={handleOriginClick}>
-               Origin
             </Button>
          </div>
          <textarea
