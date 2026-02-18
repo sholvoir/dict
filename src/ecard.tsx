@@ -1,5 +1,4 @@
 import Button from "@sholvoir/solid-components/button-ripple";
-import type { TextAreaTargeted } from "@sholvoir/solid-components/targeted";
 import { createSignal, type JSX, type Signal } from "solid-js";
 import { parse, stringify } from "yaml";
 import type { IEntry } from "#srv/lib/imic";
@@ -12,6 +11,7 @@ export default (
       onClick: () => void;
    } & JSX.HTMLAttributes<HTMLDivElement>,
 ) => {
+   let ta!: HTMLTextAreaElement;
    const [entry, setEntry] = props.entry;
    const [parseError, setParseError] = createSignal(false);
    let player!: HTMLAudioElement;
@@ -19,9 +19,9 @@ export default (
       if (!entry().sound) props.showTips("no sound to play!");
       else player.play();
    };
-   const handleMeaningsChange = (e: InputEvent & TextAreaTargeted) => {
+   const handleMeaningsChange = () => {
       try {
-         const meanings = parse(e.currentTarget.value);
+         const meanings = parse(ta.value);
          setParseError(false);
          setEntry((en) => ({ ...en, meanings }));
       } catch {
@@ -37,6 +37,20 @@ export default (
             else meanings[pos] = means;
          }
       setEntry((en) => ({ ...en, meanings }));
+   };
+   const handleBoldClick = () => {
+      const value = ta.value;
+      const selectionStart = ta.selectionStart;
+      const selectionEnd = ta.selectionEnd;
+      ta.value =
+         value.substring(0, selectionStart) +
+         "<b>" +
+         value.substring(selectionStart, selectionEnd) +
+         "</b>" +
+         value.substring(selectionEnd);
+      ta.selectionStart = selectionStart + 3;
+      ta.selectionEnd = selectionEnd + 3;
+      handleMeaningsChange();
    };
    return (
       <div
@@ -64,6 +78,9 @@ export default (
                }
                onFocus={props.onClick}
             />
+            <Button class="button btn-normal" onClick={handleBoldClick}>
+               B
+            </Button>
             <Button class="button btn-normal" onClick={handleTTClick}>
                TT
             </Button>
@@ -87,6 +104,7 @@ export default (
             </Button>
          </div>
          <textarea
+            ref={ta}
             name="meanings"
             placeholder="meanings"
             class={`h-32 grow font-mono ${parseError() ? "text-(--accent-color)" : ""}`}
