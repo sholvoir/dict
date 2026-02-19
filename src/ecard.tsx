@@ -28,25 +28,25 @@ export default (
          setParseError(true);
       }
    };
-   const handleTTClick = () => {
+   const handleStrongClick = () => {
       const meanings: Record<string, string[]> = {};
       if (entry().meanings)
          for (const [pos, means] of Object.entries(entry().meanings!)) {
             if (pos !== "ecdict")
-               meanings[pos] = means.map((m) => `${m} <tt></tt>`);
+               meanings[pos] = means.map((m) => `${m} <strong></strong>`);
             else meanings[pos] = means;
          }
       setEntry((en) => ({ ...en, meanings }));
    };
-   const handleBoldClick = () => {
+   const handleBIClick = (tag: "b" | "i") => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
       ta.value =
          value.substring(0, selectionStart) +
-         "<b>" +
+         `<${tag}>` +
          value.substring(selectionStart, selectionEnd) +
-         "</b>" +
+         `</${tag}>` +
          value.substring(selectionEnd);
       ta.selectionStart = selectionStart + 3;
       ta.selectionEnd = selectionEnd + 3;
@@ -78,11 +78,20 @@ export default (
                }
                onFocus={props.onClick}
             />
-            <Button class="button btn-normal" onClick={handleBoldClick}>
+            <Button
+               class="button btn-normal"
+               onClick={() => handleBIClick("b")}
+            >
                B
             </Button>
-            <Button class="button btn-normal" onClick={handleTTClick}>
-               TT
+            <Button
+               class="button btn-normal"
+               onClick={() => handleBIClick("i")}
+            >
+               I
+            </Button>
+            <Button class="button btn-normal" onClick={handleStrongClick}>
+               Strong
             </Button>
             <Button
                class="button btn-normal"

@@ -186,7 +186,11 @@ export default () => {
                   options={vocabulary()}
                   onChange={handleSearchClick}
                />
-               <Button class="button btn-normal" onClick={handleOriginClick}>
+               <Button
+                  class="button btn-normal"
+                  disabled={!word()}
+                  onClick={handleOriginClick}
+               >
                   Origin
                </Button>
                <Button
