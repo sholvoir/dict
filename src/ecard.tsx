@@ -48,8 +48,6 @@ export default (
          value.substring(selectionStart, selectionEnd) +
          `</${tag}>` +
          value.substring(selectionEnd);
-      ta.selectionStart = selectionStart + 3;
-      ta.selectionEnd = selectionEnd + 3;
       handleMeaningsChange();
    };
    return (
