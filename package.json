@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.9",
+   "version": "0.7.10",
    "description": "",
    "type": "module",
    "scripts": {
@@ -22,12 +22,11 @@
       "yaml": "^2.8.2"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.440",
+      "@iconify/json": "^2.2.442",
       "@iconify/utils": "^3.1.0",
-      "@tailwindcss/vite": "^4.2.0",
+      "@tailwindcss/vite": "^4.2.1",
       "solid-devtools": "^0.34.5",
-      "tailwindcss": "^4.2.0",
-      "typescript": "^5.9.3",
+      "tailwindcss": "^4.2.1",
       "vite": "^7.3.1",
       "vite-plugin-solid": "^2.11.10"
    }

@@ -126,7 +126,7 @@ export default () => {
    };
    const handleProcessIssueClick = async () => {
       const issue = issues()[currentIssueIndex()];
-      if (!issue) return;
+      if (!issue) return await handleLoadIssueClick();
       const result = await srv.deleteIssue(issue._id!);
       if (!result) return showTips("处理失败");
       if (!result.acknowledged || result.deletedCount === 0)
@@ -284,13 +284,7 @@ export default () => {
                      class="button btn-normal"
                      onClick={handleProcessIssueClick}
                   >
-                     处理问题
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleLoadIssueClick}
-                  >
-                     加载问题
+                     处理
                   </Button>
                   <Button class="button btn-normal" onClick={handleECClick}>
                      EC
