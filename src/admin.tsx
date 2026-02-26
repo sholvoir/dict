@@ -10,12 +10,15 @@ import * as srv from "./server.ts";
 
 export default () => {
    const [tips, setTips] = createSignal("");
-   let timeout: NodeJS.Timeout | undefined;
+   let timeout: number | undefined;
    const hideTips = () => setTips("");
    const showTips = (content: string, autohide = true) => {
       setTips(content);
       if (autohide) {
-         if (timeout) clearTimeout(timeout);
+         if (timeout !== undefined) {
+            clearTimeout(timeout);
+            timeout = undefined;
+         }
          timeout = setTimeout(hideTips, 3000);
       }
    };
