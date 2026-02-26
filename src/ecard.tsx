@@ -32,9 +32,16 @@ export default (
       const meanings: Record<string, string[]> = {};
       if (entry().meanings)
          for (const [pos, means] of Object.entries(entry().meanings!)) {
-            if (pos !== "ecdict")
-               meanings[pos] = means.map((m) => `${m} <strong></strong>`);
-            else meanings[pos] = means;
+            if (pos !== "ecdict") {
+               const newMeans = [];
+               for (const m of means) {
+                  if (/^[[(<]/.test(m) && /[)\]>]$/.test(m))
+                     newMeans.push(m);
+                  else
+                     newMeans.push(`${m} <strong></strong>`);
+               }
+               meanings[pos] = newMeans;
+            } else meanings[pos] = means;
          }
       setEntry((en) => ({ ...en, meanings }));
    };
