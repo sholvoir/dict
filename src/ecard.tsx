@@ -28,24 +28,7 @@ export default (
          setParseError(true);
       }
    };
-   const handleStrongClick = () => {
-      const meanings: Record<string, string[]> = {};
-      if (entry().meanings)
-         for (const [pos, means] of Object.entries(entry().meanings!)) {
-            if (pos !== "ecdict") {
-               const newMeans = [];
-               for (const m of means) {
-                  if (/^[[(<]/.test(m) && /[)\]>]$/.test(m))
-                     newMeans.push(m);
-                  else
-                     newMeans.push(`${m} <strong></strong>`);
-               }
-               meanings[pos] = newMeans;
-            } else meanings[pos] = means;
-         }
-      setEntry((en) => ({ ...en, meanings }));
-   };
-   const handleBIClick = (tag: "b" | "i") => {
+   const handleBIClick = (tag: "b" | "i" | "strong") => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -56,6 +39,24 @@ export default (
          `</${tag}>` +
          value.substring(selectionEnd);
       handleMeaningsChange();
+   };
+   const handleStrongClick = () => {
+      if (ta.selectionStart === ta.selectionEnd) {
+         const meanings: Record<string, string[]> = {};
+         if (entry().meanings)
+            for (const [pos, means] of Object.entries(entry().meanings!)) {
+               if (pos !== "ecdict") {
+                  const newMeans = [];
+                  for (const m of means) {
+                     if (/^[[(<]/.test(m) && /[)\]>]$/.test(m))
+                        newMeans.push(m);
+                     else newMeans.push(`${m} <strong></strong>`);
+                  }
+                  meanings[pos] = newMeans;
+               } else meanings[pos] = means;
+            }
+         setEntry((en) => ({ ...en, meanings }));
+      } else handleBIClick("strong");
    };
    return (
       <div
