@@ -1,7 +1,7 @@
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import List from "@sholvoir/solid-components/list";
-import { createResource, createSignal, For, Show, type Signal } from "solid-js";
+import { createSignal, For, onMount, Show, type Signal } from "solid-js";
 import type { IDict, IEntry } from "#srv/lib/imic.ts";
 import { version } from "../package.json" with { type: "json" };
 import Dialog from "./dialog.tsx";
@@ -22,10 +22,16 @@ export default () => {
          timeout = setTimeout(hideTips, 3000);
       }
    };
-   const [hide, setHide] = createSignal(false);
+   const [hideDict, setHideDict] = createSignal(false);
+   const [hideVT, setHideVT] = createSignal(false);
    const [vocabulary, setVocabulary] = createSignal<Set<string>>(new Set());
 
    const [vocabularyView, setVocabularyView] = createSignal("");
+   const handleReloadVocabularyClick = async () => {
+      const vocab = await srv.getVocabulary();
+      if (vocab) setVocabulary(new Set(vocab.words));
+      ``;
+   };
    const handleLoadVocabularyClick = () =>
       setVocabularyView(Array.from(vocabulary()).sort().join("\n"));
    const handleAddToVocabularyClick = async () => {
@@ -153,11 +159,7 @@ export default () => {
          "dict",
       );
    };
-   createResource(async () => {
-      const vocab = await srv.getVocabulary();
-      if (vocab) setVocabulary(new Set(vocab.words));
-      await handleLoadIssueClick();
-   });
+   onMount(() => (handleReloadVocabularyClick(), handleLoadIssueClick()));
    return (
       <Dialog
          left={version}
@@ -166,93 +168,103 @@ export default () => {
          tips={tips}
          class="flex flex-col gap-2 p-2"
       >
-         <div class="h-4 grow-4 flex flex-col gap-2">
-            <div class="grow flex gap-2">
-               <For each={entries()}>
-                  {(entry, i) => (
-                     <Ecard
-                        class="grow"
-                        word={word()}
-                        entry={entry}
-                        showTips={showTips}
-                        onClick={() => setCurrentCardIndex(i())}
-                     />
-                  )}
-               </For>
-            </div>
-            <div class="flex justify-between gap-2">
-               <TextInput
-                  name="word"
-                  placeholder="word"
-                  class="grow"
-                  binding={[word, setWord]}
-                  options={vocabulary()}
-                  onChange={handleSearchClick}
-               />
-               <Button
-                  class="button btn-normal"
-                  disabled={!word()}
-                  onClick={handleOriginClick}
-               >
-                  Origin
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  disabled={!word()}
-                  onClick={handleSearchClick}
-               >
-                  Search
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  disabled={word() !== currentWord()}
-                  onClick={handleAddCardClick}
-               >
-                  增卡
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  disabled={word() !== currentWord() || entries().length <= 1}
-                  onClick={handleDeleteCardClick}
-               >
-                  {`删卡${currentCardIndex()}`}
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  disabled={word() !== currentWord()}
-                  onClick={handleDeleteClick}
-               >
-                  删除
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  disabled={word() !== currentWord()}
-                  onClick={handleUpdateClick}
-               >
-                  更新
-               </Button>
-               <Button
-                  class="button btn-normal"
-                  onClick={() => setHide((h) => !h)}
-               >
-                  <span
-                     class={`text-[150%] align-bottom icon--mdi ${
-                        hide()
-                           ? "icon--mdi--chevron-up"
-                           : "icon--mdi--chevron-down"
-                     }`}
+         <Show when={!hideDict()}>
+            <div class="h-4 grow-4 flex flex-col gap-2">
+               <div class="grow flex gap-2">
+                  <For each={entries()}>
+                     {(entry, i) => (
+                        <Ecard
+                           class="grow"
+                           word={word()}
+                           entry={entry}
+                           showTips={showTips}
+                           onClick={() => setCurrentCardIndex(i())}
+                        />
+                     )}
+                  </For>
+               </div>
+               <div class="flex justify-between gap-2">
+                  <TextInput
+                     name="word"
+                     placeholder="word"
+                     class="grow"
+                     binding={[word, setWord]}
+                     options={vocabulary()}
+                     onChange={handleSearchClick}
                   />
-               </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={!word()}
+                     onClick={handleOriginClick}
+                  >
+                     Origin
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={!word()}
+                     onClick={handleSearchClick}
+                  >
+                     Search
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={word() !== currentWord()}
+                     onClick={handleAddCardClick}
+                  >
+                     增卡
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={
+                        word() !== currentWord() || entries().length <= 1
+                     }
+                     onClick={handleDeleteCardClick}
+                  >
+                     {`删卡${currentCardIndex()}`}
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={word() !== currentWord()}
+                     onClick={handleDeleteClick}
+                  >
+                     删除
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     disabled={word() !== currentWord()}
+                     onClick={handleUpdateClick}
+                  >
+                     更新
+                  </Button>
+                  <Button
+                     class="button btn-normal"
+                     onClick={() => setHideVT((h) => !h)}
+                  >
+                     <span
+                        class={`text-[150%] align-bottom icon--mdi ${
+                           hideVT()
+                              ? "icon--mdi--chevron-up"
+                              : "icon--mdi--chevron-down"
+                        }`}
+                     />
+                  </Button>
+               </div>
             </div>
-         </div>
-         <Show when={!hide()}>
-            <div class="flex gap-2 max-h-48">
+         </Show>
+         <Show when={!hideVT()}>
+            <div class={`flex gap-2 ${hideDict() ? "grow" : "max-h-48"}`}>
                <textarea
                   class="w-1 grow"
                   value={vocabularyView()}
                   onChange={(e) => setVocabularyView(e.currentTarget.value)}
                />
                <div class="flex flex-col gap-1">
+                  <Button
+                     class="button btn-normal"
+                     onClick={handleReloadVocabularyClick}
+                  >
+                     重载
+                  </Button>
                   <Button
                      class="button btn-normal"
                      onClick={handleLoadVocabularyClick}
@@ -283,6 +295,18 @@ export default () => {
                   />
                </div>
                <div class="flex flex-col gap-1">
+                  <Button
+                     class="button btn-normal"
+                     onClick={() => setHideDict((h) => !h)}
+                  >
+                     <span
+                        class={`text-[150%] align-bottom icon--mdi ${
+                           hideDict()
+                              ? "icon--mdi--chevron-down"
+                              : "icon--mdi--chevron-up"
+                        }`}
+                     />
+                  </Button>
                   <Button
                      class="button btn-normal"
                      onClick={handleProcessIssueClick}
