@@ -27,13 +27,14 @@ export default () => {
    const [vocabulary, setVocabulary] = createSignal<Set<string>>(new Set());
 
    const [vocabularyView, setVocabularyView] = createSignal("");
-   const handleReloadVocabularyClick = async () => {
+   const downloadVpobabulary = async () => {
       const vocab = await srv.getVocabulary();
       if (vocab) setVocabulary(new Set(vocab.words));
-      ``;
    };
-   const handleLoadVocabularyClick = () =>
+   const handleLoadVocabularyClick = () => {
+      downloadVpobabulary();
       setVocabularyView(Array.from(vocabulary()).sort().join("\n"));
+   };
    const handleAddToVocabularyClick = async () => {
       const res = await srv.postVocabulary(vocabularyView());
       if (res.ok) {
@@ -159,7 +160,7 @@ export default () => {
          "dict",
       );
    };
-   onMount(() => (handleReloadVocabularyClick(), handleLoadIssueClick()));
+   onMount(() => (downloadVpobabulary(), handleLoadIssueClick()));
    return (
       <Dialog
          left={version}
@@ -259,12 +260,6 @@ export default () => {
                   onChange={(e) => setVocabularyView(e.currentTarget.value)}
                />
                <div class="flex flex-col gap-1">
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleReloadVocabularyClick}
-                  >
-                     重载
-                  </Button>
                   <Button
                      class="button btn-normal"
                      onClick={handleLoadVocabularyClick}

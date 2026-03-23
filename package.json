@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.14",
+   "version": "0.7.15",
    "description": "",
    "type": "module",
    "scripts": {
@@ -19,10 +19,10 @@
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
       "mongodb": "^7.1.0",
       "solid-js": "^1.9.11",
-      "yaml": "^2.8.2"
+      "yaml": "^2.8.3"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.452",
+      "@iconify/json": "^2.2.454",
       "@iconify/utils": "^3.1.0",
       "@tailwindcss/vite": "^4.2.2",
       "solid-devtools": "^0.34.5",
