@@ -1,3 +1,4 @@
+import { STATUS_CODE } from "@sholvoir/generic/http";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import List from "@sholvoir/solid-components/list";
@@ -108,9 +109,7 @@ export default () => {
    };
 
    const [currentIssueIndex, setCurrentIssueIndex] = createSignal(0);
-   const [issues, setIssues] = createSignal<
-      Array<{ _id?: string; issue: string }>
-   >([]);
+   const [issues, setIssues] = createSignal<Array<{ issue: string }>>([]);
 
    const handleECClick = async () => {
       const resp = await srv.getEcdict();
@@ -137,10 +136,18 @@ export default () => {
    const handleProcessIssueClick = async () => {
       const issue = issues()[currentIssueIndex()];
       if (!issue) return await handleLoadIssueClick();
-      const result = await srv.deleteIssue(issue._id!);
-      if (!result) return showTips("处理失败");
-      if (!result.acknowledged || result.deletedCount === 0)
-         return showTips("处理失败");
+      switch ((await srv.deleteIssue(issue.issue)).status) {
+         case STATUS_CODE.BadRequest:
+            return showTips("输入异常");
+         case STATUS_CODE.InternalServerError:
+            return showTips("服务器错误");
+         case STATUS_CODE.NotFound:
+            return showTips("未找到");
+         case STATUS_CODE.OK:
+            break;
+         default:
+            return showTips("未知错误");
+      }
       setIssues((issues) => issues.filter((_, i) => i !== currentIssueIndex()));
       if (issues().length && currentIssueIndex() >= issues().length)
          setCurrentIssueIndex(issues().length - 1);

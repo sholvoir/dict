@@ -6,15 +6,10 @@ const API_BASE = "/api/v2";
 export const getEcdict = async () => fetch(`${API_BASE}/ecdict`);
 
 export const getIssues = () =>
-   getJson<Array<{ _id: string; issue: string }>>(`${API_BASE}/issue`);
+   getJson<Array<{ issue: string }>>(`${API_BASE}/issue`);
 
-export const deleteIssue = async (id: string) =>
-   getJson<{ acknowledged: boolean; deletedCount: number }>(
-      url(`${API_BASE}/issue`, { id }),
-      {
-         method: "DELETE",
-      },
-   );
+export const deleteIssue = async (issue: string) =>
+   fetch(url(`${API_BASE}/issue`, { issue }), { method: "DELETE" });
 
 export const getDict = (word: string, re?: true) =>
    getJson<IDict>(
