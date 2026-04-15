@@ -137,7 +137,7 @@ export default () => {
       }
    };
    const handleProcessIssueClick = async () => {
-      if (entriesChanged()) handleUpdateClick();
+      if (entriesChanged()) await handleUpdateClick();
       const issue = issues()[currentIssueIndex()];
       if (!issue) return await handleLoadIssueClick();
       switch ((await srv.deleteIssue(issue.issue)).status) {
