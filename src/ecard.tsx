@@ -7,6 +7,7 @@ export default (
    props: {
       word: string;
       entry: Signal<IEntry>;
+      entryChanged?: () => void;
       showTips: (msg: string) => void;
       onClick: () => void;
    } & JSX.HTMLAttributes<HTMLDivElement>,
@@ -24,6 +25,7 @@ export default (
          const meanings = parse(ta.value);
          setParseError(false);
          setEntry((en) => ({ ...en, meanings }));
+         if (props.entryChanged) props.entryChanged();
       } catch {
          setParseError(true);
       }
@@ -56,6 +58,7 @@ export default (
                } else meanings[pos] = means;
             }
          setEntry((en) => ({ ...en, meanings }));
+         if (props.entryChanged) props.entryChanged();
       } else handleBIClick("strong");
    };
    return (
@@ -69,9 +72,13 @@ export default (
                placeholder="phonetic"
                value={entry().phonetic}
                onFocus={props.onClick}
-               onInput={(e) =>
-                  setEntry((en) => ({ ...en, phonetic: e.currentTarget.value }))
-               }
+               onInput={(e) => {
+                  setEntry((en) => ({
+                     ...en,
+                     phonetic: e.currentTarget.value,
+                  }));
+                  if (props.entryChanged) props.entryChanged();
+               }}
             />
             <textarea
                name="sound"
@@ -79,9 +86,10 @@ export default (
                placeholder="sound"
                class="grow-5"
                value={entry().sound}
-               onInput={(e) =>
-                  setEntry((en) => ({ ...en, sound: e.currentTarget.value }))
-               }
+               onInput={(e) => {
+                  setEntry((en) => ({ ...en, sound: e.currentTarget.value }));
+                  if (props.entryChanged) props.entryChanged();
+               }}
                onFocus={props.onClick}
             />
             <Button

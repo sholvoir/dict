@@ -62,6 +62,7 @@ export default () => {
    const [currentWord, setCurrentWord] = createSignal("_");
    const [currentCardIndex, setCurrentCardIndex] = createSignal(0);
    const [entries, setEntries] = createSignal<Array<Signal<IEntry>>>([]);
+   const [entriesChanged, setEntriesChanged] = createSignal(false);
    const handleSearchClick = async () => {
       const w = encodeURIComponent(word());
       window.open(
@@ -77,6 +78,7 @@ export default () => {
       setCurrentWord(dict.word);
       setCurrentCardIndex(0);
       setEntries((dict.entries ?? []).map((e) => createSignal(e)));
+      setEntriesChanged(false);
       window.focus();
    };
    const handleAddCardClick = async () => {
@@ -99,6 +101,7 @@ export default () => {
             ? `success update word "${word()}"!`
             : "Error",
       );
+      setEntriesChanged(false);
    };
    const handleDeleteClick = async () => {
       showTips(
@@ -134,6 +137,7 @@ export default () => {
       }
    };
    const handleProcessIssueClick = async () => {
+      if (entriesChanged()) handleUpdateClick();
       const issue = issues()[currentIssueIndex()];
       if (!issue) return await handleLoadIssueClick();
       switch ((await srv.deleteIssue(issue.issue)).status) {
@@ -186,6 +190,7 @@ export default () => {
                            word={word()}
                            entry={entry}
                            showTips={showTips}
+                           entryChanged={() => setEntriesChanged(true)}
                            onClick={() => setCurrentCardIndex(i())}
                         />
                      )}
@@ -311,6 +316,7 @@ export default () => {
                   </Button>
                   <Button
                      class="button btn-normal"
+                     disabled={word() !== currentWord()}
                      onClick={handleProcessIssueClick}
                   >
                      处理
