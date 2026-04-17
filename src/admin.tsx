@@ -175,7 +175,7 @@ export default () => {
    return (
       <Dialog
          left={version}
-         title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊʃðˌ</span>}
+         title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ</span>}
          right={`${issues().length}`}
          tips={tips}
          class="flex flex-col gap-2 p-2"

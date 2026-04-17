@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.18",
+   "version": "0.7.19",
    "description": "",
    "type": "module",
    "scripts": {
@@ -21,7 +21,7 @@
       "yaml": "^2.8.3"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.462",
+      "@iconify/json": "^2.2.463",
       "@iconify/utils": "^3.1.0",
       "@tailwindcss/vite": "^4.2.2",
       "solid-devtools": "^0.34.5",
