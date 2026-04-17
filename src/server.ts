@@ -1,4 +1,4 @@
-import { getJson, jsonHeader, url } from "@sholvoir/generic/http";
+import { getJson, getText, jsonHeader, url } from "@sholvoir/generic/http";
 import type { IDict } from "#srv/lib/imic";
 
 const API_BASE = "/api/v2";
@@ -45,3 +45,5 @@ export const deleteVocabulary = (words: string) =>
       method: "DELETE",
       body: words,
    });
+
+export const version_get = () => getText(`${API_BASE}/version`);

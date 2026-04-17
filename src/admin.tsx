@@ -10,6 +10,7 @@ import Ecard from "./ecard.tsx";
 import * as srv from "./server.ts";
 
 export default () => {
+   const [sversion, setSversion] = createSignal("");
    const [tips, setTips] = createSignal("");
    let timeout: number | undefined;
    const hideTips = () => setTips("");
@@ -171,10 +172,14 @@ export default () => {
          "dict",
       );
    };
-   onMount(() => (downloadVpobabulary(), handleLoadIssueClick()));
+   onMount(() => {
+      srv.version_get().then(setSversion);
+      downloadVpobabulary();
+      handleLoadIssueClick();
+   });
    return (
       <Dialog
-         left={version}
+         left={`${sversion()}-${version.split(".")[2]}`}
          title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ</span>}
          right={`${issues().length}`}
          tips={tips}
