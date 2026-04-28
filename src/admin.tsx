@@ -1,4 +1,5 @@
 import { STATUS_CODE } from "@sholvoir/generic/http";
+import BButton from "@sholvoir/solid-components/button-base";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import List from "@sholvoir/solid-components/list";
@@ -180,13 +181,35 @@ export default () => {
    return (
       <Dialog
          left={`${sversion()}-${version.split(".")[2]}`}
-         title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ</span>}
-         right={`${issues().length}`}
+         title={
+            <span class="font-mono">
+               系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ&nbsp;{`${issues().length}`}
+            </span>
+         }
+         right={
+            <>
+               <Show when={!(hideDict() || hideVT())}>
+                  <BButton onClick={() => setHideVT(true)}>
+                     <span class="text-[150%] align-bottom icon--mdi icon--mdi--chevron-down" />
+                  </BButton>
+                  <BButton onClick={() => setHideDict(true)}>
+                     <span class="text-[150%] align-bottom icon--mdi icon--mdi--chevron-up" />
+                  </BButton>
+               </Show>
+               <Show when={hideDict() || hideVT()}>
+                  <BButton
+                     onClick={() => (setHideDict(false), setHideVT(false))}
+                  >
+                     <span class="text-[150%] align-bottom icon--mdi icon--mdi--chevron-down-up" />
+                  </BButton>
+               </Show>
+            </>
+         }
          tips={tips}
          class="flex flex-col gap-2 p-2"
       >
          <Show when={!hideDict()}>
-            <div class="h-4 grow-4 flex flex-col gap-2">
+            <div class="h-4 grow flex flex-col gap-2">
                <div class="grow flex gap-2">
                   <For each={entries()}>
                      {(entry, i) => (
@@ -254,18 +277,6 @@ export default () => {
                   >
                      更新
                   </Button>
-                  <Button
-                     class="button btn-normal"
-                     onClick={() => setHideVT((h) => !h)}
-                  >
-                     <span
-                        class={`text-[150%] align-bottom icon--mdi ${
-                           hideVT()
-                              ? "icon--mdi--chevron-up"
-                              : "icon--mdi--chevron-down"
-                        }`}
-                     />
-                  </Button>
                </div>
             </div>
          </Show>
@@ -307,18 +318,6 @@ export default () => {
                   />
                </div>
                <div class="flex flex-col gap-1">
-                  <Button
-                     class="button btn-normal"
-                     onClick={() => setHideDict((h) => !h)}
-                  >
-                     <span
-                        class={`text-[150%] align-bottom icon--mdi ${
-                           hideDict()
-                              ? "icon--mdi--chevron-down"
-                              : "icon--mdi--chevron-up"
-                        }`}
-                     />
-                  </Button>
                   <Button
                      class="button btn-normal"
                      disabled={word() !== currentWord()}

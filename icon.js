@@ -21,7 +21,7 @@ const icons = {
       // "settings",
       // "volume-up",
    ],
-   mdi: ["chevron-down", "chevron-up" /*, "cross-circle"*/],
+   mdi: ["chevron-down", "chevron-up", "chevron-down-up" /*, "cross-circle"*/],
    // hugeicons: ["online-learning-01"],
    // tabler: ["info-octagon"],
    // "icon-park-outline": ["chinese"],

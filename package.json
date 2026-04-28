@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.20",
+   "version": "0.7.21",
    "description": "",
    "type": "module",
    "scripts": {
@@ -16,16 +16,15 @@
    "dependencies": {
       "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.5",
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
-      "mongodb": "^7.1.1",
       "solid-js": "^1.9.12",
       "yaml": "^2.8.3"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.463",
-      "@iconify/utils": "^3.1.0",
-      "@tailwindcss/vite": "^4.2.2",
+      "@iconify/json": "^2.2.467",
+      "@iconify/utils": "^3.1.1",
+      "@tailwindcss/vite": "^4.2.4",
       "solid-devtools": "^0.34.5",
-      "tailwindcss": "^4.2.2",
+      "tailwindcss": "^4.2.4",
       "vite": "^7.3.2",
       "vite-plugin-solid": "^2.11.12"
    }
