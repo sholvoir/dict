@@ -139,7 +139,8 @@ export default () => {
       }
    };
    const handleProcessIssueClick = async () => {
-      if (entriesChanged()) await handleUpdateClick();
+      if (entriesChanged() && word() === currentWord())
+         await handleUpdateClick();
       const issue = issues()[currentIssueIndex()];
       if (!issue) return await handleLoadIssueClick();
       switch ((await srv.deleteIssue(issue.issue)).status) {
@@ -320,7 +321,6 @@ export default () => {
                <div class="flex flex-col gap-1">
                   <Button
                      class="button btn-normal"
-                     disabled={word() !== currentWord()}
                      onClick={handleProcessIssueClick}
                   >
                      处理
