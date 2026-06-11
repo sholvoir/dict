@@ -181,12 +181,8 @@ export default () => {
    });
    return (
       <Dialog
-         left={`${sversion()}-${version.split(".")[2]}`}
-         title={
-            <span class="font-mono">
-               系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ&nbsp;{`${issues().length}`}
-            </span>
-         }
+         left={`${sversion()}-${version.split(".")[2]} ${issues().length}`}
+         title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ</span>}
          right={
             <>
                <Show when={!(hideDict() || hideVT())}>
