@@ -50,7 +50,11 @@ export default (
                if (pos !== "ecdict") {
                   const newMeans = [];
                   for (const m of means) {
-                     if (/^[[(<]/.test(m) && /[)\]>]$/.test(m))
+                     if (
+                        /^[[(<]/.test(m) &&
+                        /[)\]>]$/.test(m) &&
+                        !m.endsWith("</strong>")
+                     )
                         newMeans.push(m);
                      else newMeans.push(`${m} <strong></strong>`);
                   }

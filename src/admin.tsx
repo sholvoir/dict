@@ -304,7 +304,7 @@ export default () => {
                      删除
                   </Button>
                </div>
-               <div class="w-1 grow border overflow-y-auto [scrollbar-width:none]">
+               <div class="w-1 grow border overflow-y-auto scrollbar-none">
                   <List
                      class="px-2"
                      cindex={[currentIssueIndex, setCurrentIssueIndex]}
