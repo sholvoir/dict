@@ -54,6 +54,16 @@ export default (
          value.substring(selectionEnd);
       handleMeaningsChange();
    };
+   const handleRemoveClick = () => {
+      const value = ta.value;
+      const selectionStart = ta.selectionStart;
+      const selectionEnd = ta.selectionEnd;
+      ta.value =
+         value.substring(0, selectionStart - 1) +
+         value.substring(selectionStart, selectionEnd) +
+         value.substring(selectionEnd + 1);
+      handleMeaningsChange();
+   };
    const handleStrongClick = () => {
       if (ta.selectionStart === ta.selectionEnd) {
          const meanings: Record<string, string[]> = {};
@@ -107,6 +117,9 @@ export default (
                }}
                onFocus={props.onClick}
             />
+            <Button class="button btn-normal" onClick={handleRemoveClick}>
+               ~
+            </Button>
             <Button
                class="button btn-normal"
                onClick={() => handleParenthesesClick("()")}
