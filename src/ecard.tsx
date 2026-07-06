@@ -42,6 +42,18 @@ export default (
          value.substring(selectionEnd);
       handleMeaningsChange();
    };
+   const handleParenthesesClick = (patenheses: "()" | "[]") => {
+      const value = ta.value;
+      const selectionStart = ta.selectionStart;
+      const selectionEnd = ta.selectionEnd;
+      ta.value =
+         value.substring(0, selectionStart) +
+         patenheses[0] +
+         value.substring(selectionStart, selectionEnd) +
+         patenheses[1] +
+         value.substring(selectionEnd);
+      handleMeaningsChange();
+   };
    const handleStrongClick = () => {
       if (ta.selectionStart === ta.selectionEnd) {
          const meanings: Record<string, string[]> = {};
@@ -51,9 +63,8 @@ export default (
                   const newMeans = [];
                   for (const m of means) {
                      if (
-                        /^[[(<]/.test(m) &&
-                        /[)\]>]$/.test(m) &&
-                        !m.endsWith("</strong>")
+                        (/^[[(<]/.test(m) && /[)\]>]$/.test(m)) ||
+                        m.endsWith("</strong>")
                      )
                         newMeans.push(m);
                      else newMeans.push(`${m} <strong></strong>`);
@@ -96,6 +107,18 @@ export default (
                }}
                onFocus={props.onClick}
             />
+            <Button
+               class="button btn-normal"
+               onClick={() => handleParenthesesClick("()")}
+            >
+               ()
+            </Button>
+            <Button
+               class="button btn-normal"
+               onClick={() => handleParenthesesClick("[]")}
+            >
+               []
+            </Button>
             <Button
                class="button btn-normal"
                onClick={() => handleBIClick("b")}
