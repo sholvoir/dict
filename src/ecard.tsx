@@ -65,26 +65,24 @@ export default (
       handleMeaningsChange();
    };
    const handleStrongClick = () => {
-      if (ta.selectionStart === ta.selectionEnd) {
-         const meanings: Record<string, string[]> = {};
-         if (entry().meanings)
-            for (const [pos, means] of Object.entries(entry().meanings!)) {
-               if (pos !== "ecdict") {
-                  const newMeans = [];
-                  for (const m of means) {
-                     if (
-                        (/^[[(<]/.test(m) && /[)\]>]$/.test(m)) ||
-                        m.endsWith("</strong>")
-                     )
-                        newMeans.push(m);
-                     else newMeans.push(`${m} <strong></strong>`);
-                  }
-                  meanings[pos] = newMeans;
-               } else meanings[pos] = means;
-            }
-         setEntry((en) => ({ ...en, meanings }));
-         if (props.entryChanged) props.entryChanged();
-      } else handleBIClick("strong");
+      const meanings: Record<string, string[]> = {};
+      if (entry().meanings)
+         for (const [pos, means] of Object.entries(entry().meanings!)) {
+            if (pos !== "ecdict") {
+               const newMeans = [];
+               for (const m of means) {
+                  if (
+                     (/^[[(<]/.test(m) && /[)\]>]$/.test(m)) ||
+                     m.endsWith("</strong>")
+                  )
+                     newMeans.push(m);
+                  else newMeans.push(`${m} <strong></strong>`);
+               }
+               meanings[pos] = newMeans;
+            } else meanings[pos] = means;
+         }
+      setEntry((en) => ({ ...en, meanings }));
+      if (props.entryChanged) props.entryChanged();
    };
    return (
       <div
@@ -144,6 +142,12 @@ export default (
             >
                I
             </Button>
+            <Button
+               class="button btn-normal"
+               onClick={() => handleBIClick("strong")}
+            >
+               S
+            </Button>
             <Button class="button btn-normal" onClick={handleStrongClick}>
                Strong
             </Button>
@@ -163,7 +167,7 @@ export default (
                onClick={handlePlayClick}
                disabled={!entry().sound}
             >
-               <span class="text-[150%] align-bottom icon--material-symbols icon--material-symbols--chevron-right" />
+               <span class="text-[150%] align-bottom icon--tdesign icon--tdesign--sound" />
             </Button>
          </div>
          <textarea

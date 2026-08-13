@@ -8,10 +8,10 @@ import { getIconsCSS } from "@iconify/utils";
  * @type {Record<string, string[]>}
  */
 const icons = {
-   "material-symbols": [
+   tdesign: [
       // "check-circle",
       // "chevron-left",
-      "chevron-right",
+      "sound",
       // "delete-outline",
       // "dictionary",
       // "error",
