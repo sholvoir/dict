@@ -167,7 +167,7 @@ export default (
                onClick={handlePlayClick}
                disabled={!entry().sound}
             >
-               <span class="text-[150%] align-bottom icon--tdesign icon--tdesign--sound" />
+               <span class="text-[120%] align-[-13%] icon--tdesign icon--tdesign--sound" />
             </Button>
          </div>
          <textarea
