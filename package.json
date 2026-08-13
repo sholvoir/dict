@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.26",
+   "version": "0.7.27",
    "description": "",
    "type": "module",
    "scripts": {
@@ -14,18 +14,18 @@
       "#srv/*": "../dict-server/src/*"
    },
    "dependencies": {
-      "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.5",
+      "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.6",
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
       "solid-js": "^1.9.14",
       "yaml": "^2.9.0"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.496",
+      "@iconify/json": "^2.2.514",
       "@iconify/utils": "^3.1.4",
-      "@tailwindcss/vite": "^4.3.2",
+      "@tailwindcss/vite": "^4.3.3",
       "solid-devtools": "^0.34.5",
-      "tailwindcss": "^4.3.2",
+      "tailwindcss": "^4.3.3",
       "vite": "^7.3.6",
-      "vite-plugin-solid": "^2.11.12"
+      "vite-plugin-solid": "^2.11.14"
    }
 }
