@@ -113,7 +113,9 @@ export default () => {
          if (meanings)
             for (const [pos, means] of Object.entries(meanings)) {
                if (pos !== "ecdict")
-                  results += stringify({ pos: means }, { lineWidth: 0 });
+                  results += stringify(Object.fromEntries([[pos, means]]), {
+                     lineWidth: 0,
+                  });
             }
       }
       navigator.clipboard.writeText(results);
