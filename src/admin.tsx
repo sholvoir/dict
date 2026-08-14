@@ -4,6 +4,7 @@ import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import List from "@sholvoir/solid-components/list";
 import { createSignal, For, onMount, Show, type Signal } from "solid-js";
+import { stringify } from "yaml";
 import type { IDict, IEntry } from "#srv/lib/imic.ts";
 import { version } from "../package.json" with { type: "json" };
 import Dialog from "./dialog.tsx";
@@ -104,6 +105,14 @@ export default () => {
             : "Error",
       );
       setEntriesChanged(false);
+   };
+   const handleCopyClick = async () => {
+      let results = `${word()}--\n`;
+      for (const [entry] of entries()) {
+         results += stringify(entry().meanings, { lineWidth: 0 });
+      }
+      navigator.clipboard.writeText(results);
+      showTips("copied");
    };
    const handleDeleteClick = async () => {
       showTips(
@@ -273,6 +282,9 @@ export default () => {
                      onClick={handleUpdateClick}
                   >
                      更新
+                  </Button>
+                  <Button class="button btn-normal" onClick={handleCopyClick}>
+                     Copy
                   </Button>
                </div>
             </div>

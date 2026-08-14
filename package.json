@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.29",
+   "version": "0.7.30",
    "description": "",
    "type": "module",
    "scripts": {
@@ -14,13 +14,13 @@
       "#srv/*": "../dict-server/src/*"
    },
    "dependencies": {
-      "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.6",
+      "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.8",
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
       "solid-js": "^1.9.14",
       "yaml": "^2.9.0"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.514",
+      "@iconify/json": "^2.2.516",
       "@iconify/utils": "^3.1.4",
       "@tailwindcss/vite": "^4.3.3",
       "solid-devtools": "^0.34.5",
