@@ -107,9 +107,14 @@ export default () => {
       setEntriesChanged(false);
    };
    const handleCopyClick = async () => {
-      let results = `${word()}--\n`;
+      let results = `${word()} --\n`;
       for (const [entry] of entries()) {
-         results += stringify(entry().meanings, { lineWidth: 0 });
+         const meanings = entry().meanings;
+         if (meanings)
+            for (const [pos, means] of Object.entries(meanings)) {
+               if (pos !== "ecdict")
+                  results += stringify({ pos: means }, { lineWidth: 0 });
+            }
       }
       navigator.clipboard.writeText(results);
       showTips("copied");
