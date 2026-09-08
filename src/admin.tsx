@@ -31,12 +31,12 @@ export default () => {
    const [vocabulary, setVocabulary] = createSignal<Set<string>>(new Set());
 
    const [vocabularyView, setVocabularyView] = createSignal("");
-   const downloadVpobabulary = async () => {
+   const downloadVocabulary = async () => {
       const vocab = await srv.getVocabulary();
       if (vocab) setVocabulary(new Set(vocab.words));
    };
    const handleLoadVocabularyClick = () => {
-      downloadVpobabulary();
+      downloadVocabulary();
       setVocabularyView(Array.from(vocabulary()).sort().join("\n"));
    };
    const handleAddToVocabularyClick = async () => {
@@ -66,6 +66,12 @@ export default () => {
    const [currentCardIndex, setCurrentCardIndex] = createSignal(0);
    const [entries, setEntries] = createSignal<Array<Signal<IEntry>>>([]);
    const [entriesChanged, setEntriesChanged] = createSignal(false);
+   const handleOriginClick = () => {
+      window.open(
+         `https://dict.micinfotech.com/api/v2/dict?q=${word()}`,
+         "dict",
+      );
+   };
    const handleSearchClick = async () => {
       const w = encodeURIComponent(word());
       window.open(
@@ -94,6 +100,13 @@ export default () => {
       if (currentCardIndex() >= entries().length)
          setCurrentCardIndex(entries().length - 1);
    };
+   const handleDeleteClick = async () => {
+      showTips(
+         (await srv.deleteDict(word()))
+            ? `success delete word "${word()}"!`
+            : "Error",
+      );
+   };
    const handleUpdateClick = async () => {
       const dict: IDict = {
          word: word(),
@@ -121,13 +134,6 @@ export default () => {
       navigator.clipboard.writeText(results);
       showTips("copied");
    };
-   const handleDeleteClick = async () => {
-      showTips(
-         (await srv.deleteDict(word()))
-            ? `success delete word "${word()}"!`
-            : "Error",
-      );
-   };
 
    const [currentIssueIndex, setCurrentIssueIndex] = createSignal(0);
    const [issues, setIssues] = createSignal<Array<{ issue: string }>>([]);
@@ -142,9 +148,12 @@ export default () => {
 
    const handleLoadIssueClick = async () => {
       const issues = await srv.getIssues();
-      if (issues) {
+      if (!issues) return;
+      if (issues.length) {
          setIssues(issues);
          handleIssueClick();
+      } else {
+         showTips("No more Issues!");
       }
    };
    const handleIssueClick = () => {
@@ -184,15 +193,9 @@ export default () => {
       }
       showTips("处理成功!");
    };
-   const handleOriginClick = () => {
-      window.open(
-         `https://dict.micinfotech.com/api/v2/dict?q=${word()}`,
-         "dict",
-      );
-   };
    onMount(() => {
       srv.version_get().then(setSversion);
-      downloadVpobabulary();
+      downloadVocabulary();
       handleLoadIssueClick();
    });
    return (
