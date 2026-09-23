@@ -3,13 +3,26 @@ import BButton from "@sholvoir/solid-components/button-base";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import List from "@sholvoir/solid-components/list";
-import { createSignal, For, onMount, Show, type Signal } from "solid-js";
+import {
+   createSignal,
+   For,
+   onCleanup,
+   onMount,
+   Show,
+   type Signal,
+} from "solid-js";
 import { stringify } from "yaml";
 import type { IDict, IEntry } from "#srv/lib/imic.ts";
 import { version } from "../package.json" with { type: "json" };
 import Dialog from "./dialog.tsx";
 import Ecard from "./ecard.tsx";
 import * as srv from "./server.ts";
+
+let dictWindow: Window | null = null;
+let websterWindow: Window | null = null;
+let oxfordWindow: Window | null = null;
+const closeDict = () => dictWindow?.close();
+const closeWindow = () => (websterWindow?.close(), oxfordWindow?.close());
 
 export default () => {
    const [sversion, setSversion] = createSignal("");
@@ -67,18 +80,18 @@ export default () => {
    const [entries, setEntries] = createSignal<Array<Signal<IEntry>>>([]);
    const [entriesChanged, setEntriesChanged] = createSignal(false);
    const handleOriginClick = () => {
-      window.open(
+      dictWindow = window.open(
          `https://dict.micinfotech.com/api/v2/dict?q=${word()}`,
          "dict",
       );
    };
    const handleSearchClick = async () => {
       const w = encodeURIComponent(word());
-      window.open(
+      websterWindow = window.open(
          `https://www.merriam-webster.com/dictionary/${w}`,
          "merriam-webster",
       );
-      window.open(
+      oxfordWindow = window.open(
          `https://www.oxfordlearnersdictionaries.com/us/search/english/?q=${w}`,
          "oxfordlearnersdictionaries",
       );
@@ -154,6 +167,7 @@ export default () => {
          handleIssueClick();
       } else {
          showTips("No more Issues!");
+         closeWindow();
       }
    };
    const handleIssueClick = () => {
@@ -198,6 +212,7 @@ export default () => {
       downloadVocabulary();
       handleLoadIssueClick();
    });
+   onCleanup(() => (closeDict(), closeWindow()));
    return (
       <Dialog
          left={`${sversion()}-${version.split(".")[2]} ${issues().length}`}
