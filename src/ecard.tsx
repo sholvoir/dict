@@ -13,6 +13,10 @@ export default (
    } & JSX.HTMLAttributes<HTMLDivElement>,
 ) => {
    let ta!: HTMLTextAreaElement;
+   const taSelect = (start: number, end: number) => {
+      ta.focus();
+      ta.setSelectionRange(start, end);
+   };
    const [entry, setEntry] = props.entry;
    const [parseError, setParseError] = createSignal(false);
    let player!: HTMLAudioElement;
@@ -41,6 +45,8 @@ export default (
          `</${tag}>` +
          value.substring(selectionEnd);
       handleMeaningsChange();
+      const l = tag.length + 2;
+      taSelect(selectionStart + l, selectionEnd + l);
    };
    const handleParenthesesClick = (patenheses: "()" | "[]") => {
       const value = ta.value;
@@ -53,6 +59,7 @@ export default (
          patenheses[1] +
          value.substring(selectionEnd);
       handleMeaningsChange();
+      taSelect(selectionStart + 1, selectionEnd + 1);
    };
    const handleRemoveClick = () => {
       const value = ta.value;
@@ -63,6 +70,7 @@ export default (
          value.substring(selectionStart, selectionEnd) +
          value.substring(selectionEnd + 1);
       handleMeaningsChange();
+      taSelect(selectionStart - 1, selectionEnd - 1);
    };
    const handleStrongClick = () => {
       const meanings: Record<string, string[]> = {};

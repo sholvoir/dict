@@ -308,7 +308,11 @@ export default () => {
                   >
                      更新
                   </Button>
-                  <Button class="button btn-normal" onClick={handleCopyClick}>
+                  <Button
+                     class="button btn-normal"
+                     disabled={!word()}
+                     onClick={handleCopyClick}
+                  >
                      Copy
                   </Button>
                </div>
