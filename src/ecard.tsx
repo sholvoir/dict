@@ -44,7 +44,7 @@ export default (
       ta.value =
          value.substring(0, selectionStart) + r + value.substring(selectionEnd);
       handleMeaningsChange();
-      taSelect(selectionStart, r.length);
+      taSelect(selectionStart, selectionStart + r.length);
    };
    const handleBIClick = (tag: "b" | "i" | "strong") => {
       const value = ta.value;
