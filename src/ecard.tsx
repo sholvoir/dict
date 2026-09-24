@@ -2,6 +2,7 @@ import Button from "@sholvoir/solid-components/button-ripple";
 import { createSignal, type JSX, type Signal } from "solid-js";
 import { parse, stringify } from "yaml";
 import type { IEntry } from "#srv/lib/imic";
+import refine from "#srv/lib/refine.ts";
 
 export default (
    props: {
@@ -33,6 +34,17 @@ export default (
       } catch {
          setParseError(true);
       }
+   };
+   const handleRefineClick = () => {
+      const value = ta.value;
+      const selectionStart = ta.selectionStart;
+      const selectionEnd = ta.selectionEnd;
+      const r = refine(value.substring(selectionStart, selectionEnd));
+      if (!r) return;
+      ta.value =
+         value.substring(0, selectionStart) + r + value.substring(selectionEnd);
+      handleMeaningsChange();
+      taSelect(selectionStart, r.length);
    };
    const handleBIClick = (tag: "b" | "i" | "strong") => {
       const value = ta.value;
@@ -123,6 +135,9 @@ export default (
                }}
                onFocus={props.onClick}
             />
+            <Button class="button btn-normal" onClick={handleRefineClick}>
+               ^
+            </Button>
             <Button class="button btn-normal" onClick={handleRemoveClick}>
                ~
             </Button>
