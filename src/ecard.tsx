@@ -60,7 +60,7 @@ export default (
       const l = tag.length + 2;
       taSelect(selectionStart + l, selectionEnd + l);
    };
-   const handleParenthesesClick = (patenheses: "()" | "[]") => {
+   const handleParenthesesClick = (patenheses: "()" | "[]" | '""') => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -140,6 +140,12 @@ export default (
             </Button>
             <Button class="button btn-normal" onClick={handleRemoveClick}>
                ~
+            </Button>
+            <Button
+               class="button btn-normal"
+               onClick={() => handleParenthesesClick('""')}
+            >
+               &quot;&quot;
             </Button>
             <Button
                class="button btn-normal"
