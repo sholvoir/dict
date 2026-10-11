@@ -1,17 +1,17 @@
-import { type Accessor, type JSX, Show, splitProps } from "solid-js";
+import { type JSX, Show, splitProps } from "solid-js";
+import { tips } from "./tips";
 
-export type DialogProps = {
-   bottom?: JSX.Element;
-   left?: JSX.Element;
-   leftClick?: () => void;
-   noleft?: boolean;
-   right?: JSX.Element;
-   tips?: Accessor<string | undefined>;
-   title: JSX.Element;
-   tools?: JSX.Element;
-} & Omit<JSX.HTMLAttributes<HTMLDivElement>, "title">;
-
-export default (props: DialogProps) => {
+export default (
+   props: {
+      bottom?: JSX.Element;
+      left?: JSX.Element;
+      leftClick?: () => void;
+      noleft?: boolean;
+      right?: JSX.Element;
+      title: JSX.Element;
+      tools?: JSX.Element;
+   } & Omit<JSX.HTMLAttributes<HTMLDivElement>, "title">,
+) => {
    const [local, others] = splitProps(props, [
       "bottom",
       "children",
@@ -20,7 +20,6 @@ export default (props: DialogProps) => {
       "leftClick",
       "noleft",
       "right",
-      "tips",
       "title",
       "tools",
    ]);
@@ -28,14 +27,14 @@ export default (props: DialogProps) => {
       <>
          <div
             class={`title shrink-0 px-2 flex justify-between items-center font-bold ${
-               local.tips?.() ? "bg-(--bg-accent)" : "bg-(--bg-title)"
+               tips() ? "bg-(--bg-accent)" : "bg-(--bg-title)"
             } text-center`}
          >
             <div class="min-w-7 [app-region:no-drag]">
                <Show when={local.left}>{local.left}</Show>
             </div>
             <div class="grow font-bold [app-region:drag]">
-               {local.tips?.() || local.title}
+               {tips() || local.title}
             </div>
             <div class="min-w-7 [app-region:no-drag]">
                <Show when={local.right}>{local.right}</Show>

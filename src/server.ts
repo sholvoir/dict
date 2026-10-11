@@ -1,5 +1,6 @@
+import type { IDictionary } from "@sholvoir/dict-server/src/lib/idict.ts";
+import type { IDict } from "@sholvoir/dict-server/src/lib/imic.ts";
 import { getJson, getText, jsonHeader, url } from "@sholvoir/generic/http";
-import type { IDict } from "#srv/lib/imic";
 
 const API_BASE = "/api/v2";
 
@@ -11,9 +12,9 @@ export const getIssues = () =>
 export const deleteIssue = async (issue: string) =>
    fetch(url(`${API_BASE}/issue`, { issue }), { method: "DELETE" });
 
-export const getDict = (word: string, re?: true) =>
-   getJson<IDict>(
-      url(`${API_BASE}/dict`, { q: word, mic: "1", re: re ? "1" : undefined }),
+export const getDictionary = (word: string, re?: true) =>
+   getJson<IDictionary>(
+      url(`${API_BASE}/dict`, { q: word, re: re ? "1" : undefined }),
    );
 
 export const putDict = (dict: IDict) =>

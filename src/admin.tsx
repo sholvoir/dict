@@ -1,221 +1,52 @@
-import { STATUS_CODE } from "@sholvoir/generic/http";
 import BButton from "@sholvoir/solid-components/button-base";
-import Button from "@sholvoir/solid-components/button-ripple";
-import TextInput from "@sholvoir/solid-components/input-text";
-import List from "@sholvoir/solid-components/list";
-import {
-   createSignal,
-   For,
-   onCleanup,
-   onMount,
-   Show,
-   type Signal,
-} from "solid-js";
-import { stringify } from "yaml";
-import type { IDict, IEntry } from "#srv/lib/imic.ts";
+import { createSignal, onMount, Show } from "solid-js";
 import { version } from "../package.json" with { type: "json" };
 import Dialog from "./dialog.tsx";
-import Ecard from "./ecard.tsx";
+import Dict from "./dict.tsx";
+import Issue from "./issue.tsx";
 import * as srv from "./server.ts";
-
-let dictWindow: Window | null = null;
-let websterWindow: Window | null = null;
-let oxfordWindow: Window | null = null;
-const closeDict = () => dictWindow?.close();
-const closeWindow = () => (websterWindow?.close(), oxfordWindow?.close());
+import { downloadVocabulary, vocabulary } from "./vocabulary.ts";
+import Vocabulary from "./vocabulary.tsx";
 
 export default () => {
    const [sversion, setSversion] = createSignal("");
-   const [tips, setTips] = createSignal("");
-   let timeout: number | undefined;
-   const hideTips = () => setTips("");
-   const showTips = (content: string, autohide = true) => {
-      setTips(content);
-      if (autohide) {
-         if (timeout !== undefined) {
-            clearTimeout(timeout);
-            timeout = undefined;
-         }
-         timeout = setTimeout(hideTips, 3000);
-      }
-   };
    const [hideDict, setHideDict] = createSignal(false);
    const [hideVT, setHideVT] = createSignal(false);
-   const [vocabulary, setVocabulary] = createSignal<Set<string>>(new Set());
-
-   const [vocabularyView, setVocabularyView] = createSignal("");
-   const downloadVocabulary = async () => {
-      const vocab = await srv.getVocabulary();
-      if (vocab) setVocabulary(new Set(vocab.words));
+   let searchWord: (word: string) => Promise<void>;
+   let updateDict: () => Promise<void>;
+   const registerSearch = (sr: (word: string) => Promise<void>) => {
+      searchWord = sr;
    };
-   const handleLoadVocabularyClick = () => {
-      downloadVocabulary();
-      setVocabularyView(Array.from(vocabulary()).sort().join("\n"));
+   const registerUpdateDict = (ud: () => Promise<void>) => {
+      updateDict = ud;
    };
-   const handleAddToVocabularyClick = async () => {
-      const res = await srv.postVocabulary(vocabularyView());
-      if (res.ok) {
-         const words = vocabularyView().split("\n");
-         const vocab = vocabulary();
-         for (const word of words) vocab.add(word.trim());
-         setVocabularyView("");
-         showTips("上传成功");
-         setVocabulary(vocab);
-      } else showTips("上传失败");
-   };
-   const handleDeleteFromVocabularyClick = async () => {
-      const res = await srv.deleteVocabulary(vocabularyView());
-      if (res.ok) {
-         const words = vocabularyView().split("\n");
-         const vocab = vocabulary();
-         for (const word of words) vocab.delete(word);
-         setVocabularyView("");
-         showTips("删除成功");
-      } else showTips("删除失败");
+   const beforeProcessIssue = async () => {
+      if (updateDict) await updateDict();
    };
 
-   const [word, setWord] = createSignal("");
-   const [currentWord, setCurrentWord] = createSignal("_");
-   const [currentCardIndex, setCurrentCardIndex] = createSignal(0);
-   const [entries, setEntries] = createSignal<Array<Signal<IEntry>>>([]);
-   const [entriesChanged, setEntriesChanged] = createSignal(false);
-   const handleOriginClick = () => {
-      dictWindow = window.open(
-         `https://dict.micinfotech.com/api/v2/dict?q=${word()}`,
-         "dict",
-      );
-   };
-   const handleSearchClick = async () => {
-      const w = encodeURIComponent(word());
-      websterWindow = window.open(
-         `https://www.merriam-webster.com/dictionary/${w}`,
-         "merriam-webster",
-      );
-      oxfordWindow = window.open(
-         `https://www.oxfordlearnersdictionaries.com/us/search/english/?q=${w}`,
-         "oxfordlearnersdictionaries",
-      );
-      const dict = (await srv.getDict(word())) as IDict;
-      if (!dict) return showTips("Not Found");
-      setCurrentWord(dict.word);
-      setCurrentCardIndex(0);
-      setEntries((dict.entries ?? []).map((e) => createSignal(e)));
-      setEntriesChanged(false);
-      window.focus();
-   };
-   const handleAddCardClick = async () => {
-      const dict = (await srv.getDict(word(), true)) as IDict;
-      if (dict) setEntries([...entries(), createSignal(dict.entries?.[0]!)]);
-   };
-   const handleDeleteCardClick = () => {
-      if (entries().length > 1)
-         setEntries(entries().toSpliced(currentCardIndex(), 1));
-      if (currentCardIndex() >= entries().length)
-         setCurrentCardIndex(entries().length - 1);
-   };
-   const handleDeleteClick = async () => {
-      showTips(
-         (await srv.deleteDict(word()))
-            ? `success delete word "${word()}"!`
-            : "Error",
-      );
-   };
-   const handleUpdateClick = async () => {
-      const dict: IDict = {
-         word: word(),
-         entries: entries().map((e) => e[0]()),
-      };
-      showTips(
-         (await srv.putDict(dict))
-            ? `success update word "${word()}"!`
-            : "Error",
-      );
-      setEntriesChanged(false);
-   };
-   const handleCopyClick = async () => {
-      let results = `${word()} --\n`;
-      for (const [entry] of entries()) {
-         const meanings = entry().meanings;
-         if (meanings)
-            for (const [pos, means] of Object.entries(meanings)) {
-               if (pos !== "ecdict")
-                  results += stringify(Object.fromEntries([[pos, means]]), {
-                     lineWidth: 0,
-                  });
-            }
+   const search = async (wd: string) => {
+      if (searchWord) {
+         const w = encodeURIComponent(wd);
+         window.open(
+            `https://www.merriam-webster.com/dictionary/${w}`,
+            "merriam-webster",
+         );
+         window.open(
+            `https://www.oxfordlearnersdictionaries.com/us/search/english/?q=${w}`,
+            "oxfordlearnersdictionaries",
+         );
+         window.focus();
+         searchWord(wd);
       }
-      navigator.clipboard.writeText(results);
-      showTips("copied");
    };
 
-   const [currentIssueIndex, setCurrentIssueIndex] = createSignal(0);
-   const [issues, setIssues] = createSignal<Array<{ issue: string }>>([]);
-
-   const handleECClick = async () => {
-      const resp = await srv.getEcdict();
-      if (resp.ok) {
-         showTips("EC导入成功");
-         await handleLoadIssueClick();
-      } else showTips("EC导入失败");
-   };
-
-   const handleLoadIssueClick = async () => {
-      const issues = await srv.getIssues();
-      if (!issues) return;
-      if (issues.length) {
-         setIssues(issues);
-         handleIssueClick();
-      } else {
-         showTips("No more Issues!");
-         closeWindow();
-      }
-   };
-   const handleIssueClick = () => {
-      const issue = issues()[currentIssueIndex()];
-      if (issue) {
-         setWord(issue.issue);
-         handleSearchClick();
-      }
-   };
-   const handleProcessIssueClick = async () => {
-      if (entriesChanged() && word() === currentWord())
-         await handleUpdateClick();
-      const issue = issues()[currentIssueIndex()];
-      if (!issue) return await handleLoadIssueClick();
-      switch ((await srv.deleteIssue(issue.issue)).status) {
-         case STATUS_CODE.BadRequest:
-            return showTips("输入异常");
-         case STATUS_CODE.InternalServerError:
-            return showTips("服务器错误");
-         case STATUS_CODE.NotFound:
-            return showTips("未找到");
-         case STATUS_CODE.OK:
-            break;
-         default:
-            return showTips("未知错误");
-      }
-      setIssues((issues) => issues.filter((_, i) => i !== currentIssueIndex()));
-      if (issues().length && currentIssueIndex() >= issues().length)
-         setCurrentIssueIndex(issues().length - 1);
-      if (issues().length) handleIssueClick();
-      else {
-         setWord("");
-         setCurrentWord("_");
-         setEntries([]);
-         setCurrentCardIndex(0);
-         handleLoadIssueClick();
-      }
-      showTips("处理成功!");
-   };
    onMount(() => {
       srv.version_get().then(setSversion);
       downloadVocabulary();
-      handleLoadIssueClick();
    });
-   onCleanup(() => (closeDict(), closeWindow()));
    return (
       <Dialog
-         left={`${sversion()}-${version.split(".")[2]} ${issues().length}`}
+         left={`${sversion()}-${version.split(".")[2]}`}
          title={<span class="font-mono">系统管理&nbsp;ˈθʒɔɑɜæəɪʌʊɡʃðˌ</span>}
          right={
             <>
@@ -236,136 +67,21 @@ export default () => {
                </Show>
             </>
          }
-         tips={tips}
          class="flex flex-col gap-2 p-2"
       >
          <Show when={!hideDict()}>
-            <div class="h-4 grow flex flex-col gap-2">
-               <div class="grow flex gap-2">
-                  <For each={entries()}>
-                     {(entry, i) => (
-                        <Ecard
-                           class="grow"
-                           word={word()}
-                           entry={entry}
-                           showTips={showTips}
-                           entryChanged={() => setEntriesChanged(true)}
-                           onClick={() => setCurrentCardIndex(i())}
-                        />
-                     )}
-                  </For>
-               </div>
-               <div class="flex justify-between gap-2">
-                  <TextInput
-                     name="word"
-                     placeholder="word"
-                     class="grow"
-                     binding={[word, setWord]}
-                     options={vocabulary()}
-                     onChange={handleSearchClick}
-                  />
-                  <Button
-                     class="button btn-normal"
-                     disabled={!word()}
-                     onClick={handleOriginClick}
-                  >
-                     Origin
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={!word()}
-                     onClick={handleSearchClick}
-                  >
-                     Search
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={word() !== currentWord()}
-                     onClick={handleAddCardClick}
-                  >
-                     增卡
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={
-                        word() !== currentWord() || entries().length <= 1
-                     }
-                     onClick={handleDeleteCardClick}
-                  >
-                     {`删卡${currentCardIndex()}`}
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={word() !== currentWord()}
-                     onClick={handleDeleteClick}
-                  >
-                     删除
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={word() !== currentWord()}
-                     onClick={handleUpdateClick}
-                  >
-                     更新
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     disabled={!word()}
-                     onClick={handleCopyClick}
-                  >
-                     Copy
-                  </Button>
-               </div>
-            </div>
+            <Dict
+               registerSearch={registerSearch}
+               registerUpdate={registerUpdateDict}
+            />
          </Show>
          <Show when={!hideVT()}>
             <div class={`flex gap-2 ${hideDict() ? "grow" : "max-h-48"}`}>
-               <textarea
-                  class="w-1 grow"
-                  value={vocabularyView()}
-                  onChange={(e) => setVocabularyView(e.currentTarget.value)}
+               <Vocabulary
+                  vocabulary={vocabulary}
+                  downloadVocabulary={downloadVocabulary}
                />
-               <div class="flex flex-col gap-1">
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleLoadVocabularyClick}
-                  >
-                     加载
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleAddToVocabularyClick}
-                  >
-                     上传
-                  </Button>
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleDeleteFromVocabularyClick}
-                  >
-                     删除
-                  </Button>
-               </div>
-               <div class="w-1 grow border overflow-y-auto scrollbar-none">
-                  <List
-                     class="px-2"
-                     cindex={[currentIssueIndex, setCurrentIssueIndex]}
-                     activeClass="bg-[var(--bg-title)]"
-                     options={issues()}
-                     func={(issue) => issue.issue}
-                     onClick={handleIssueClick}
-                  />
-               </div>
-               <div class="flex flex-col gap-1">
-                  <Button
-                     class="button btn-normal"
-                     onClick={handleProcessIssueClick}
-                  >
-                     处理
-                  </Button>
-                  <Button class="button btn-normal" onClick={handleECClick}>
-                     EC
-                  </Button>
-               </div>
+               <Issue onSearch={search} beforeProcess={beforeProcessIssue} />
             </div>
          </Show>
       </Dialog>

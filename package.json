@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.7.39",
+   "version": "0.8.0",
    "description": "",
    "type": "module",
    "scripts": {
@@ -10,22 +10,20 @@
       "serve": "vite preview"
    },
    "license": "MIT",
-   "imports": {
-      "#srv/*": "../dict-server/src/*"
-   },
    "dependencies": {
+      "@sholvoir/dict-server": "github:sholvoir/dict-server",
       "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.8",
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
-      "solid-js": "^1.9.15",
+      "solid-js": "^1.9.17",
       "yaml": "^2.9.1"
    },
    "devDependencies": {
-      "@iconify/json": "^2.2.538",
+      "@iconify/json": "^2.2.541",
       "@iconify/utils": "^3.1.7",
       "@tailwindcss/vite": "^4.3.3",
       "solid-devtools": "^0.34.5",
       "tailwindcss": "^4.3.3",
-      "vite": "^8.3.2",
+      "vite": "^8.3.4",
       "vite-plugin-solid": "^2.11.14"
    }
 }

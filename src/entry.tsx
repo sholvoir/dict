@@ -1,16 +1,18 @@
+import { type IEntry, Poses } from "@sholvoir/dict-server/src/lib/imic";
+import refine from "@sholvoir/dict-server/src/lib/refine.ts";
 import Button from "@sholvoir/solid-components/button-ripple";
-import { createSignal, type JSX, type Signal } from "solid-js";
-import { parse, stringify } from "yaml";
-import type { IEntry } from "#srv/lib/imic";
-import refine from "#srv/lib/refine.ts";
+import InputText from "@sholvoir/solid-components/input-text";
+import type { JSX } from "solid-js";
+import { showTips } from "./tips";
 
 export default (
    props: {
       word: string;
-      entry: Signal<IEntry>;
-      entryChanged?: () => void;
-      showTips: (msg: string) => void;
-      onClick: () => void;
+      entry: IEntry;
+      onPosChange: (pos: string) => void;
+      onSoundChange: (sound: string) => void;
+      onPhoneticChange: (phonetic: string) => void;
+      onMeaningsChange: (meanings: string) => void;
    } & JSX.HTMLAttributes<HTMLDivElement>,
 ) => {
    let ta!: HTMLTextAreaElement;
@@ -18,22 +20,10 @@ export default (
       ta.focus();
       ta.setSelectionRange(start, end);
    };
-   const [entry, setEntry] = props.entry;
-   const [parseError, setParseError] = createSignal(false);
    let player!: HTMLAudioElement;
    const handlePlayClick = () => {
-      if (!entry().sound) props.showTips("no sound to play!");
+      if (!props.entry.sound) showTips("no sound to play!");
       else player.play();
-   };
-   const handleMeaningsChange = () => {
-      try {
-         const meanings = parse(ta.value);
-         setParseError(false);
-         setEntry((en) => ({ ...en, meanings }));
-         if (props.entryChanged) props.entryChanged();
-      } catch {
-         setParseError(true);
-      }
    };
    const handleRefineClick = () => {
       const value = ta.value;
@@ -41,22 +31,22 @@ export default (
       const selectionEnd = ta.selectionEnd;
       const r = refine(value.substring(selectionStart, selectionEnd));
       if (!r) return;
-      ta.value =
-         value.substring(0, selectionStart) + r + value.substring(selectionEnd);
-      handleMeaningsChange();
+      props.onMeaningsChange(
+         value.substring(0, selectionStart) + r + value.substring(selectionEnd),
+      );
       taSelect(selectionStart, selectionStart + r.length);
    };
    const handleBIClick = (tag: "b" | "i" | "strong") => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      ta.value =
+      props.onMeaningsChange(
          value.substring(0, selectionStart) +
-         `<${tag}>` +
-         value.substring(selectionStart, selectionEnd) +
-         `</${tag}>` +
-         value.substring(selectionEnd);
-      handleMeaningsChange();
+            `<${tag}>` +
+            value.substring(selectionStart, selectionEnd) +
+            `</${tag}>` +
+            value.substring(selectionEnd),
+      );
       const l = tag.length + 2;
       taSelect(selectionStart + l, selectionEnd + l);
    };
@@ -64,45 +54,38 @@ export default (
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      ta.value =
+      props.onMeaningsChange(
          value.substring(0, selectionStart) +
-         patenheses[0] +
-         value.substring(selectionStart, selectionEnd) +
-         patenheses[1] +
-         value.substring(selectionEnd);
-      handleMeaningsChange();
+            patenheses[0] +
+            value.substring(selectionStart, selectionEnd) +
+            patenheses[1] +
+            value.substring(selectionEnd),
+      );
       taSelect(selectionStart + 1, selectionEnd + 1);
    };
    const handleRemoveClick = () => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      ta.value =
+      props.onMeaningsChange(
          value.substring(0, selectionStart - 1) +
-         value.substring(selectionStart, selectionEnd) +
-         value.substring(selectionEnd + 1);
-      handleMeaningsChange();
+            value.substring(selectionStart, selectionEnd) +
+            value.substring(selectionEnd + 1),
+      );
       taSelect(selectionStart - 1, selectionEnd - 1);
    };
    const handleStrongClick = () => {
-      const meanings: Record<string, string[]> = {};
-      if (entry().meanings)
-         for (const [pos, means] of Object.entries(entry().meanings!)) {
-            if (pos !== "ecdict") {
-               const newMeans = [];
-               for (const m of means) {
-                  if (
-                     (/^[[(<]/.test(m) && /[)\]>]$/.test(m)) ||
-                     m.endsWith("</strong>")
-                  )
-                     newMeans.push(m);
-                  else newMeans.push(`${m} <strong></strong>`);
-               }
-               meanings[pos] = newMeans;
-            } else meanings[pos] = means;
-         }
-      setEntry((en) => ({ ...en, meanings }));
-      if (props.entryChanged) props.entryChanged();
+      if (!props.entry.meanings) return;
+      const nmeanings: Array<string> = [];
+      for (const meaning of props.entry.meanings.split("\n")) {
+         if (
+            (/^[[(<]/.test(meaning) && /[)\]>]$/.test(meaning)) ||
+            meaning.endsWith("</strong>")
+         )
+            nmeanings.push(meaning);
+         else nmeanings.push(`${meaning} <strong></strong>`);
+      }
+      props.onMeaningsChange(nmeanings.join("\n"));
    };
    return (
       <div
@@ -110,30 +93,24 @@ export default (
          onClick={props.onClick}
       >
          <div class="shrink flex gap-2">
+            <InputText
+               value={props.entry.pos}
+               onInput={props.onPosChange}
+               options={Poses}
+            />
             <input
                name="phonetic"
                placeholder="phonetic"
-               value={entry().phonetic}
-               onFocus={props.onClick}
-               onInput={(e) => {
-                  setEntry((en) => ({
-                     ...en,
-                     phonetic: e.currentTarget.value,
-                  }));
-                  if (props.entryChanged) props.entryChanged();
-               }}
+               value={props.entry.phonetic}
+               onInput={(e) => props.onPhoneticChange(e.currentTarget.value)}
             />
             <textarea
                name="sound"
                rows={1}
                placeholder="sound"
                class="grow-5"
-               value={entry().sound}
-               onInput={(e) => {
-                  setEntry((en) => ({ ...en, sound: e.currentTarget.value }));
-                  if (props.entryChanged) props.entryChanged();
-               }}
-               onFocus={props.onClick}
+               value={props.entry.sound}
+               onInput={(e) => props.onSoundChange(e.currentTarget.value)}
             />
             <Button class="button btn-normal" onClick={handleRefineClick}>
                ^
@@ -183,10 +160,9 @@ export default (
             <Button
                class="button btn-normal"
                onClick={() =>
-                  setEntry((en) => ({
-                     ...en,
-                     sound: `https://dict.youdao.com/dictvoice?type=2&audio=${props.word.replaceAll(" ", "+")}`,
-                  }))
+                  props.onSoundChange(
+                     `https://dict.youdao.com/dictvoice?type=2&audio=${props.word.replaceAll(" ", "+")}`,
+                  )
                }
             >
                YDS
@@ -194,7 +170,7 @@ export default (
             <Button
                class="button btn-normal"
                onClick={handlePlayClick}
-               disabled={!entry().sound}
+               disabled={!!props.entry.sound}
             >
                <span class="text-[120%] align-[-13%] icon--tdesign icon--tdesign--sound" />
             </Button>
@@ -203,12 +179,11 @@ export default (
             ref={ta}
             name="meanings"
             placeholder="meanings"
-            class={`h-32 grow font-mono ${parseError() ? "text-(--accent-color)" : ""}`}
-            value={stringify(entry().meanings, { lineWidth: 0 })}
-            onInput={handleMeaningsChange}
-            onFocus={props.onClick}
+            class="h-32 grow font-mono"
+            value={props.entry.meanings}
+            onInput={(e) => props.onMeaningsChange(e.currentTarget.value)}
          />
-         <audio ref={player} src={entry().sound} />
+         <audio ref={player} src={props.entry.sound} />
       </div>
    );
 };
