@@ -1,6 +1,6 @@
 {
    "name": "@sholvoir/dict",
-   "version": "0.8.0",
+   "version": "0.8.1",
    "description": "",
    "type": "module",
    "scripts": {
@@ -14,8 +14,7 @@
       "@sholvoir/dict-server": "github:sholvoir/dict-server",
       "@sholvoir/generic": "npm:@jsr/sholvoir__generic@^0.4.8",
       "@sholvoir/solid-components": "github:sholvoir/solid-components",
-      "solid-js": "^1.9.17",
-      "yaml": "^2.9.1"
+      "solid-js": "^1.9.17"
    },
    "devDependencies": {
       "@iconify/json": "^2.2.541",

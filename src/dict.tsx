@@ -1,10 +1,8 @@
-import type { IDict } from "@sholvoir/dict-server/src/lib/imic.ts";
+import type { IDict, IEntry } from "@sholvoir/dict-server/src/lib/imic.ts";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
-import Tab from "@sholvoir/solid-components/tab";
-import { createSignal, Show } from "solid-js";
-import { createStore } from "solid-js/store";
-import { stringify } from "yaml";
+import { createSignal, For } from "solid-js";
+import { createStore, type Part } from "solid-js/store";
 import Entry from "./entry";
 import * as srv from "./server.ts";
 import { showTips } from "./tips.ts";
@@ -16,12 +14,11 @@ export default (props: {
 }) => {
    const [dict, setDict] = createStore<IDict>({ word: "_", entries: [] });
    const [cword, setCWord] = createSignal("");
-   const [entryIndex, setEntryIndex] = createSignal(0);
    const [isChanged, setChanged] = createSignal(false);
 
    const handleSearchClick = async () => {
       const word = cword();
-      const dictionary = await srv.getDictionary(word, true);
+      const dictionary = await srv.getDictionary(word);
       const dict = dictionary?.mic;
       if (!dict) return showTips("Not Found");
       setDict(dict);
@@ -58,24 +55,28 @@ export default (props: {
       setDict("entries", (entries) => (entries ? [...entries, {}] : [{}]));
    };
 
-   const handleDeleteEntryClick = () => {
-      setDict("entries", (entries) => entries.toSpliced(entryIndex(), 1));
-      if (entryIndex() >= (dict.entries?.length ?? 0))
-         setEntryIndex((dict.entries?.length ?? 0) - 1);
+   const handleEntryChange = (
+      index: number,
+      propName: Part<IEntry, keyof IEntry>,
+      value: string,
+   ) => {
+      setDict("entries", index, propName, value);
+      setChanged(true);
+   };
+
+   const handleEntryDelete = (index: number) => {
+      setDict("entries", (entries) => entries.filter((_, i) => i !== index));
+      setChanged(true);
    };
 
    const handleCopyClick = async () => {
-      let results = `${cword()} --\n`;
-      for (const entry of dict.entries) {
-         const meanings = entry.meanings;
-         if (meanings)
-            for (const [pos, means] of Object.entries(meanings)) {
-               if (pos !== "ecdict")
-                  results += stringify(Object.fromEntries([[pos, means]]), {
-                     lineWidth: 0,
-                  });
-            }
-      }
+      let results = `${dict.word} --\n`;
+      for (const entry of dict.entries)
+         if (entry.meanings && entry.pos !== "ecdict") {
+            results += `${entry.pos}:\n`;
+            for (const meaning of entry.meanings.split("\n"))
+               results += ` - ${meaning}\n`;
+         }
       navigator.clipboard.writeText(results);
       showTips("copied");
    };
@@ -85,35 +86,18 @@ export default (props: {
 
    return (
       <div class="h-4 grow flex flex-col gap-2">
-         <div class="grow flex flex-col">
-            <Show when={dict.entries?.length}>
-               <Tab
-                  activeClass="bg-(--bg-tab)"
-                  index={entryIndex()}
-                  onTabSelected={setEntryIndex}
-                  options={dict.entries!.map((en) => en.pos ?? "")}
+         <For each={dict.entries}>
+            {(entry, i) => (
+               <Entry
+                  class="grow"
+                  entry={entry}
+                  index={i()}
+                  onChange={handleEntryChange}
+                  onDelete={handleEntryDelete}
+                  word={dict.word}
                />
-               <section class="grow p-2 bg-(--bg-tab)">
-                  <Entry
-                     class="grow"
-                     word={dict.word}
-                     entry={dict.entries![entryIndex()]}
-                     onPosChange={(pos) =>
-                        setDict("entries", entryIndex(), "pos", pos)
-                     }
-                     onSoundChange={(sound) =>
-                        setDict("entries", entryIndex(), "sound", sound)
-                     }
-                     onPhoneticChange={(phonetic) =>
-                        setDict("entries", entryIndex(), "phonetic", phonetic)
-                     }
-                     onMeaningsChange={(meanings) =>
-                        setDict("entries", entryIndex(), "meanings", meanings)
-                     }
-                  />
-               </section>
-            </Show>
-         </div>
+            )}
+         </For>
          <div class="flex justify-between gap-2">
             <TextInput
                name="word"
@@ -144,15 +128,6 @@ export default (props: {
                onClick={handleAddEntryClick}
             >
                新条目
-            </Button>
-            <Button
-               class="button btn-normal"
-               disabled={
-                  dict.word !== cword() || (dict.entries?.length ?? 0) <= 1
-               }
-               onClick={handleDeleteEntryClick}
-            >
-               删条目
             </Button>
             <Button
                class="button btn-normal"

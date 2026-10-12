@@ -34,6 +34,7 @@ export default (props: {
       <>
          <textarea
             class="w-1 grow"
+            name="vocabulary"
             value={vocabulary()}
             onChange={(e) => setVocabulary(e.currentTarget.value)}
          />
