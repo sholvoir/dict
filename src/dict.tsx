@@ -1,4 +1,5 @@
 import type { IDict, IEntry } from "@sholvoir/dict-server/src/lib/imic.ts";
+import { STATUS_CODE } from "@sholvoir/generic/http";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import { createSignal, For } from "solid-js";
@@ -18,21 +19,26 @@ export default (props: {
 
    const handleSearchClick = async () => {
       const word = cword();
-      const dictionary = await srv.getDictionary(word);
-      const dict = dictionary?.mic;
-      if (!dict) return showTips("Not Found");
-      setDict(dict);
+      const dictionary = await srv.dict_get(word);
+      const mic = dictionary?.mic;
+      if (!mic) return showTips("Not Found");
+      setDict(mic);
       setChanged(false);
    };
 
    const handleUpdateClick = async () => {
       if (isChanged() && dict.word === cword()) {
-         showTips(
-            (await srv.putDict(dict))
-               ? `success update word "${cword()}"!`
-               : "Error",
-         );
-         setChanged(false);
+         dict.version = Date.now();
+         const res = await srv.dict_patch({ mic: dict });
+         switch (res.status) {
+            case STATUS_CODE.BadRequest:
+               return showTips("更新失败, 输入数据错误!");
+            case STATUS_CODE.InternalServerError:
+               return showTips("更新失败, 服务器错误!");
+            case STATUS_CODE.OK:
+               setChanged(false);
+               return showTips("更新成功!");
+         }
       }
    };
 
@@ -45,7 +51,7 @@ export default (props: {
 
    const handleDeleteClick = async () => {
       showTips(
-         (await srv.deleteDict(cword()))
+         (await srv.dict_delete(cword()))
             ? `success delete word "${cword()}"!`
             : "Error",
       );

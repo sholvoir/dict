@@ -13,7 +13,7 @@ export default (props: {
    const [cindex, setCIndex] = createSignal(0);
 
    const loadIssues = async () => {
-      const isses = await srv.getIssues();
+      const isses = await srv.issue_get();
       if (!isses?.length) {
          showTips("No more Issues!");
       } else {
@@ -30,7 +30,7 @@ export default (props: {
    };
 
    const handleECClick = async () => {
-      const resp = await srv.getEcdict();
+      const resp = await srv.ecdict_get();
       if (resp.ok) {
          showTips("EC导入成功");
          await loadIssues();
@@ -41,7 +41,7 @@ export default (props: {
       await props.beforeProcess();
       if (!issues().length) return await loadIssues();
       const issue = issues()[cindex()];
-      switch ((await srv.deleteIssue(issue)).status) {
+      switch ((await srv.issue_delete(issue)).status) {
          case STATUS_CODE.BadRequest:
             return showTips("输入异常");
          case STATUS_CODE.InternalServerError:
@@ -58,10 +58,6 @@ export default (props: {
       showTips("处理成功!");
       if (nisses.length) issueSelected();
       else loadIssues();
-      // setWord("");
-      // setCurrentWord("_");
-      // setEntries([]);
-      // setCurrentEntryIndex(0);
    };
 
    onMount(loadIssues);

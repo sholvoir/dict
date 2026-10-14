@@ -13,7 +13,7 @@ export default (props: {
       setVocabulary(Array.from(props.vocabulary).sort().join("\n"));
    };
    const handleAddToVocabularyClick = async () => {
-      const res = await srv.postVocabulary(vocabulary());
+      const res = await srv.vocabulary_post(vocabulary());
       if (res.ok) {
          const words = vocabulary().split("\n");
          for (const word of words) props.vocabulary.add(word.trim());
@@ -22,7 +22,7 @@ export default (props: {
       } else showTips("上传失败");
    };
    const handleDeleteFromVocabularyClick = async () => {
-      const res = await srv.deleteVocabulary(vocabulary());
+      const res = await srv.vocabulary_delete(vocabulary());
       if (res.ok) {
          const words = vocabulary().split("\n");
          for (const word of words) props.vocabulary.delete(word);
