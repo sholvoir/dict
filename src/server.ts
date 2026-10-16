@@ -1,4 +1,4 @@
-import type { IDictionary } from "@sholvoir/dict-server/src/lib/idict.ts";
+import type { IDictionary } from "@sholvoir/dict-server/src/lib/idictionary.ts";
 import {
    getJson,
    getText,
@@ -6,25 +6,30 @@ import {
    textInit,
    url,
 } from "@sholvoir/generic/http";
+import type { IIssue } from "./iissue.ts";
 
 const API_BASE = "/api/v2";
 
 export const dict_get = (word: string, d?: string) =>
-   getJson<IDictionary>(url(`${API_BASE}/dict`, { q: word, d }));
+   getJson<Partial<IDictionary>>(
+      url(`${API_BASE}/dict/${encodeURIComponent(word)}`, { d }),
+   );
 
 export const dict_patch = (dict: Partial<IDictionary>) =>
-   fetch(`${API_BASE}/dict`, jsonInit(dict, "PUT"));
+   fetch(
+      `${API_BASE}/dict/${dict.input ?? dict.mic?.word ?? ""}`,
+      jsonInit(dict, "PUT"),
+   );
 
 export const dict_delete = (word: string) =>
-   fetch(url(`${API_BASE}/dict`, { q: word }), { method: "DELETE" });
+   fetch(`${API_BASE}/dict/${encodeURIComponent(word)}`, { method: "DELETE" });
 
 export const ecdict_get = async () => fetch(`${API_BASE}/ecdict`);
 
-export const issue_get = () =>
-   getJson<Array<{ issue: string }>>(`${API_BASE}/issue`);
+export const issue_get = () => getJson<Array<IIssue>>(`${API_BASE}/issue`);
 
-export const issue_delete = async (issue: string) =>
-   fetch(url(`${API_BASE}/issue`, { issue }), { method: "DELETE" });
+export const issue_delete = async (id: string) =>
+   fetch(`${API_BASE}/issue/${encodeURIComponent(id)}`, { method: "DELETE" });
 
 export const vocabulary_get = () =>
    getJson<{

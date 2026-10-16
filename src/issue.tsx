@@ -2,6 +2,7 @@ import { STATUS_CODE } from "@sholvoir/generic/http";
 import Button from "@sholvoir/solid-components/button-ripple";
 import List from "@sholvoir/solid-components/list";
 import { createSignal, onMount } from "solid-js";
+import type { IIssue } from "./iissue.ts";
 import * as srv from "./server.ts";
 import { showTips } from "./tips.ts";
 
@@ -9,7 +10,7 @@ export default (props: {
    onSearch: (w: string) => void;
    beforeProcess: () => Promise<void>;
 }) => {
-   const [issues, setIssues] = createSignal<Array<string>>([]);
+   const [issues, setIssues] = createSignal<Array<IIssue>>([]);
    const [cindex, setCIndex] = createSignal(0);
 
    const loadIssues = async () => {
@@ -17,7 +18,7 @@ export default (props: {
       if (!isses?.length) {
          showTips("No more Issues!");
       } else {
-         setIssues(isses.map((iss) => iss.issue));
+         setIssues(isses);
          issueSelected();
       }
    };
@@ -25,7 +26,7 @@ export default (props: {
    const issueSelected = () => {
       if (issues().length) {
          const issue = issues()[cindex()];
-         if (issue) props.onSearch(issue);
+         if (issue) props.onSearch(issue.issue);
       }
    };
 
@@ -41,7 +42,7 @@ export default (props: {
       await props.beforeProcess();
       if (!issues().length) return await loadIssues();
       const issue = issues()[cindex()];
-      switch ((await srv.issue_delete(issue)).status) {
+      switch ((await srv.issue_delete(issue.id)).status) {
          case STATUS_CODE.BadRequest:
             return showTips("输入异常");
          case STATUS_CODE.InternalServerError:
@@ -53,7 +54,9 @@ export default (props: {
          default:
             return showTips("未知错误");
       }
-      const nisses = setIssues((isses) => isses.filter((iss) => iss !== issue));
+      const nisses = setIssues((isses) =>
+         isses.filter((_, i) => i !== cindex()),
+      );
       if (cindex() >= nisses.length) setCIndex(nisses.length - 1);
       showTips("处理成功!");
       if (nisses.length) issueSelected();
@@ -70,7 +73,7 @@ export default (props: {
                index={cindex()}
                class="px-2"
                onItemSelect={(i) => (setCIndex(i), issueSelected)}
-               options={issues()}
+               options={issues().map((issue) => issue.issue)}
             />
          </div>
          <div class="flex flex-col gap-1">
