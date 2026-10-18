@@ -42,7 +42,7 @@ export default (
       );
       taSelect(selectionStart, selectionStart + r.length);
    };
-   const handleBIClick = (tag: "b" | "i" | "strong") => {
+   const handleBIClick = (tag: "b" | "i" | "t") => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -86,16 +86,16 @@ export default (
       );
       taSelect(selectionStart - 1, selectionEnd - 1);
    };
-   const handleStrongClick = () => {
+   const handleTransClick = () => {
       if (!props.entry.meanings) return;
       const nmeanings: Array<string> = [];
       for (const meaning of props.entry.meanings.split("\n")) {
          if (
             (/^[[(<]/.test(meaning) && /[)\]>]$/.test(meaning)) ||
-            meaning.endsWith("</strong>")
+            meaning.endsWith("</t>")
          )
             nmeanings.push(meaning);
-         else nmeanings.push(`${meaning} <strong></strong>`);
+         else nmeanings.push(`${meaning} <t></t>`);
       }
       props.onChange(props.index, "meanings", nmeanings.join("\n"));
    };
@@ -106,14 +106,14 @@ export default (
       >
          <div class="shrink flex gap-2">
             <InputText
-               class="w-20"
+               class="w-36"
                name="pos"
                value={props.entry.pos}
                onInput={(v) => props.onChange(props.index, "pos", v)}
                options={Poses}
             />
             <input
-               class="w-60"
+               class="w-36"
                name="phonetic"
                placeholder="phonetic"
                value={props.entry.phonetic}
@@ -176,12 +176,12 @@ export default (
             </Button>
             <Button
                class="button btn-normal"
-               onClick={() => handleBIClick("strong")}
+               onClick={() => handleBIClick("t")}
             >
-               S
+               T
             </Button>
-            <Button class="button btn-normal" onClick={handleStrongClick}>
-               Strong
+            <Button class="button btn-normal" onClick={handleTransClick}>
+               Trans
             </Button>
             <Button
                class="button btn-normal"
