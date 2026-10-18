@@ -18,7 +18,7 @@ export const dict_get = (word: string, d?: string) =>
 export const dict_patch = (dict: Partial<IDictionary>) =>
    fetch(
       `${API_BASE}/dict/${dict.input ?? dict.mic?.word ?? ""}`,
-      jsonInit(dict, "PUT"),
+      jsonInit(dict, "PATCH"),
    );
 
 export const dict_delete = (word: string) =>

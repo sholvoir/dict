@@ -106,14 +106,14 @@ export default (
       >
          <div class="shrink flex gap-2">
             <InputText
-               class="w-36"
+               class="w-36 shrink-0"
                name="pos"
                value={props.entry.pos}
                onInput={(v) => props.onChange(props.index, "pos", v)}
                options={Poses}
             />
             <input
-               class="w-36"
+               class="w-36 shrink-0"
                name="phonetic"
                placeholder="phonetic"
                value={props.entry.phonetic}

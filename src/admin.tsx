@@ -24,21 +24,7 @@ export default () => {
       if (updateDict) await updateDict();
    };
 
-   const search = async (wd: string) => {
-      if (searchWord) {
-         const w = encodeURIComponent(wd);
-         window.open(
-            `https://www.merriam-webster.com/dictionary/${w}`,
-            "merriam-webster",
-         );
-         window.open(
-            `https://www.oxfordlearnersdictionaries.com/us/search/english/?q=${w}`,
-            "oxfordlearnersdictionaries",
-         );
-         window.focus();
-         searchWord(wd);
-      }
-   };
+   const search = async (wd: string) => searchWord?.(wd);
 
    onMount(() => {
       srv.version_get().then(setSversion);

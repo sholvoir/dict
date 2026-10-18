@@ -19,6 +19,7 @@ export default (props: {
          showTips("No more Issues!");
       } else {
          setIssues(isses);
+         if (cindex() >= isses.length) setCIndex(isses.length - 1);
          issueSelected();
       }
    };
@@ -54,13 +55,14 @@ export default (props: {
          default:
             return showTips("未知错误");
       }
+      showTips("处理成功!");
       const nisses = setIssues((isses) =>
          isses.filter((_, i) => i !== cindex()),
       );
-      if (cindex() >= nisses.length) setCIndex(nisses.length - 1);
-      showTips("处理成功!");
-      if (nisses.length) issueSelected();
-      else loadIssues();
+      if (nisses.length) {
+         if (cindex() >= nisses.length) setCIndex(nisses.length - 1);
+         issueSelected();
+      } else loadIssues();
    };
 
    onMount(loadIssues);

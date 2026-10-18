@@ -19,6 +19,16 @@ export default (props: {
 
    const handleSearchClick = async () => {
       const word = cword();
+      const w = encodeURIComponent(word);
+      window.open(
+         `https://www.merriam-webster.com/dictionary/${w}`,
+         "merriam-webster",
+      );
+      window.open(
+         `https://www.oxfordlearnersdictionaries.com/us/search/english/?q=${w}`,
+         "oxfordlearnersdictionaries",
+      );
+      window.focus();
       const dictionary = await srv.dict_get(word);
       const mic = dictionary?.mic;
       if (!mic) return showTips("Not Found");
@@ -28,7 +38,7 @@ export default (props: {
 
    const handleUpdateClick = async () => {
       if (isChanged() && dict.word === cword()) {
-         dict.version = Date.now();
+         setDict("version", Date.now());
          const res = await srv.dict_patch({ mic: dict });
          switch (res.status) {
             case STATUS_CODE.BadRequest:
@@ -44,7 +54,7 @@ export default (props: {
 
    const handleOriginClick = () => {
       window.open(
-         `https://dict.micinfotech.com/api/v2/dict?q=${cword()}`,
+         `https://dict.micinfotech.com/api/v2/dict/${encodeURIComponent(cword())}`,
          "dict",
       );
    };
