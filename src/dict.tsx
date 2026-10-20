@@ -1,9 +1,9 @@
-import type { IDict, IEntry } from "@sholvoir/dict-server/src/lib/imic.ts";
+import type { IDict } from "@sholvoir/dict-server/src/lib/imic.ts";
 import { STATUS_CODE } from "@sholvoir/generic/http";
 import Button from "@sholvoir/solid-components/button-ripple";
 import TextInput from "@sholvoir/solid-components/input-text";
 import { createSignal, For } from "solid-js";
-import { createStore, type Part } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import Entry from "./entry";
 import * as srv from "./server.ts";
 import { showTips } from "./tips.ts";
@@ -15,7 +15,7 @@ export default (props: {
 }) => {
    const [dict, setDict] = createStore<IDict>({ word: "_", entries: [] });
    const [cword, setCWord] = createSignal("");
-   const [isChanged, setChanged] = createSignal(false);
+   let isChanged = false;
 
    const handleSearchClick = async () => {
       const word = cword();
@@ -33,11 +33,11 @@ export default (props: {
       const mic = dictionary?.mic;
       if (!mic) return showTips("Not Found");
       setDict(mic);
-      setChanged(false);
+      isChanged = false;
    };
 
    const handleUpdateClick = async () => {
-      if (isChanged() && dict.word === cword()) {
+      if (isChanged && dict.word === cword()) {
          setDict("version", Date.now());
          const res = await srv.dict_patch({ mic: dict });
          switch (res.status) {
@@ -46,7 +46,7 @@ export default (props: {
             case STATUS_CODE.InternalServerError:
                return showTips("更新失败, 服务器错误!");
             case STATUS_CODE.OK:
-               setChanged(false);
+               isChanged = false;
                return showTips("更新成功!");
          }
       }
@@ -67,32 +67,15 @@ export default (props: {
       );
    };
 
-   const handleAddEntryClick = async () => {
-      setDict("entries", (entries) => (entries ? [...entries, {}] : [{}]));
-   };
-
-   const handleEntryChange = (
-      index: number,
-      propName: Part<IEntry, keyof IEntry>,
-      value: string,
-   ) => {
-      setDict("entries", index, propName, value);
-      setChanged(true);
-   };
-
-   const handleEntryDelete = (index: number) => {
-      setDict("entries", (entries) => entries.filter((_, i) => i !== index));
-      setChanged(true);
-   };
-
    const handleCopyClick = async () => {
       let results = `${dict.word} --\n`;
-      for (const entry of dict.entries)
-         if (entry.meanings && entry.pos !== "ecdict") {
-            results += `${entry.pos}:\n`;
-            for (const meaning of entry.meanings.split("\n"))
-               results += ` - ${meaning}\n`;
-         }
+      if (dict.entries)
+         for (const entry of dict.entries)
+            if (entry.meanings && entry.pos !== "ecdict") {
+               results += `${entry.pos}:\n`;
+               for (const meaning of entry.meanings)
+                  results += ` - ${meaning}\n`;
+            }
       navigator.clipboard.writeText(results);
       showTips("copied");
    };
@@ -107,9 +90,27 @@ export default (props: {
                <Entry
                   class="grow"
                   entry={entry}
-                  index={i()}
-                  onChange={handleEntryChange}
-                  onDelete={handleEntryDelete}
+                  onDelete={() => (
+                     setDict("entries", (entries) =>
+                        entries?.filter((_, index) => i() !== index),
+                     ),
+                     (isChanged = true)
+                  )}
+                  onMeaningsChange={(meanings) => (
+                     setDict("entries", i(), "meanings", meanings),
+                     (isChanged = true)
+                  )}
+                  onPosChange={(pos) => (
+                     setDict("entries", i(), "pos", pos), (isChanged = true)
+                  )}
+                  onPronouncesChange={(pronounces) => (
+                     setDict("entries", i(), "pronounces", pronounces),
+                     (isChanged = true)
+                  )}
+                  onPronouncesItemChange={(ip, key, value) => (
+                     setDict("entries", i(), "pronounces", ip, key, value),
+                     (isChanged = true)
+                  )}
                   word={dict.word}
                />
             )}
@@ -141,7 +142,12 @@ export default (props: {
             <Button
                class="button btn-normal"
                disabled={dict.word !== cword()}
-               onClick={handleAddEntryClick}
+               onClick={() => (
+                  setDict("entries", (entries) =>
+                     entries ? [...entries, {}] : [{}],
+                  ),
+                  (isChanged = true)
+               )}
             >
                新条目
             </Button>
