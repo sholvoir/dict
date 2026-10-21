@@ -1,7 +1,7 @@
 import type { IEntry, IPronounce } from "@sholvoir/dict-server/src/lib/imic";
 import refine from "@sholvoir/dict-server/src/lib/refine.ts";
 import Button from "@sholvoir/solid-components/button-ripple";
-import { For, type JSX } from "solid-js";
+import { For, type JSX, Show } from "solid-js";
 import Pronounce from "./pronounce";
 
 const buttonClass = "flex-none button btn-normal";
@@ -18,6 +18,7 @@ export default (
          key: keyof IPronounce,
          v: IPronounce[typeof key],
       ) => void;
+      onTopChange?: (t: string) => void;
       word: string;
    } & JSX.HTMLAttributes<HTMLDivElement>,
 ) => {
@@ -174,6 +175,12 @@ export default (
                删本条目
             </Button>
          </div>
+         <Show when={props.entry.top}>
+            <input
+               value={props.entry.top}
+               onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
+            />
+         </Show>
          <textarea
             ref={ta}
             name="meanings"

@@ -33,11 +33,17 @@
          "style": {
             "noNonNullAssertion": "off"
          }
-      }
+      },
+      "includes": ["**", "!docs/**"]
    },
    "javascript": {
       "formatter": {
          "quoteStyle": "double"
+      }
+   },
+   "css": {
+      "parser": {
+         "tailwindDirectives": true
       }
    },
    "assist": {

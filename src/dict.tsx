@@ -111,6 +111,9 @@ export default (props: {
                      setDict("entries", i(), "pronounces", ip, key, value),
                      (isChanged = true)
                   )}
+                  onTopChange={(top) => (
+                     setDict("entries", i(), "top", top), (isChanged = true)
+                  )}
                   word={dict.word}
                />
             )}
