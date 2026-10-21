@@ -71,8 +71,9 @@ export default (props: {
       let results = `${dict.word} --\n`;
       if (dict.entries)
          for (const entry of dict.entries)
-            if (entry.meanings && entry.pos !== "ecdict") {
+            if (entry.meanings?.length && entry.pos !== "ecdict") {
                results += `${entry.pos}:\n`;
+               if (entry.top) results += `${entry.top}\n`;
                for (const meaning of entry.meanings)
                   results += ` - ${meaning}\n`;
             }
