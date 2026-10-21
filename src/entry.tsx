@@ -179,20 +179,22 @@ export default (
             </Button>
          </div>
          <Show when={props.entry.top !== undefined}>
-            <input
-               value={props.entry.top}
+            <textarea
+               rows={1}
+               onFocus={(e) => (ta = e.currentTarget)}
                onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
+               value={props.entry.top}
             />
          </Show>
          <textarea
-            ref={ta}
-            name="meanings"
-            placeholder="meanings"
             class="h-32 grow font-mono"
-            value={props.entry.meanings?.join("\n")}
+            name="meanings"
+            onFocus={(e) => (ta = e.currentTarget)}
             onInput={(e) =>
                props.onMeaningsChange?.(e.currentTarget.value.split("\n"))
             }
+            placeholder="meanings"
+            value={props.entry.meanings?.join("\n")}
          />
       </div>
    );
