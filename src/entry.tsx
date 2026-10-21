@@ -159,6 +159,9 @@ export default (
             <Button class={buttonClass} onClick={handleTransClick}>
                Trans
             </Button>
+            <Button class={buttonClass} onClick={() => props.onTopChange?.("")}>
+               Top
+            </Button>
             <Button
                class={buttonClass}
                onClick={() =>
@@ -175,7 +178,7 @@ export default (
                删本条目
             </Button>
          </div>
-         <Show when={props.entry.top}>
+         <Show when={props.entry.top !== undefined}>
             <input
                value={props.entry.top}
                onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
