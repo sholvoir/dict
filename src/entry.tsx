@@ -1,5 +1,4 @@
 import type { IEntry, IPronounce } from "@sholvoir/dict-server/src/lib/imic";
-import refine from "@sholvoir/dict-server/src/lib/refine.ts";
 import Button from "@sholvoir/solid-components/button-ripple";
 import { For, type JSX, Show } from "solid-js";
 import Pronounce from "./pronounce";
@@ -26,17 +25,6 @@ export default (
    const taSelect = (start: number, end: number) => {
       ta.focus();
       ta.setSelectionRange(start, end);
-   };
-   const handleRefineClick = () => {
-      const value = ta.value;
-      const selectionStart = ta.selectionStart;
-      const selectionEnd = ta.selectionEnd;
-      const r = refine(value.substring(selectionStart, selectionEnd));
-      if (!r) return;
-      ta.value =
-         value.substring(0, selectionStart) + r + value.substring(selectionEnd);
-      ta.dispatchEvent(new Event("input"));
-      taSelect(selectionStart, selectionStart + r.length);
    };
    const handleBIClick = (tag: "b" | "i" | "t") => {
       const value = ta.value;
@@ -123,9 +111,6 @@ export default (
                value={props.entry.pos}
                onInput={(e) => props.onPosChange?.(e.currentTarget.value)}
             />
-            <Button class={buttonClass} onClick={handleRefineClick}>
-               ^
-            </Button>
             <Button class={buttonClass} onClick={handleRemoveClick}>
                ~
             </Button>
