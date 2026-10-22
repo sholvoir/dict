@@ -78,7 +78,7 @@ export default (
    };
    const handleTransClick = () => {
       const nlines: Array<string> = [];
-      for (const line of ta.value) {
+      for (const line of ta.value.split("\n")) {
          if (
             (/^[[(<]/.test(line) && /[)\]>]$/.test(line)) ||
             line.endsWith("</t>")
