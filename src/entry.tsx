@@ -33,22 +33,22 @@ export default (
       const selectionEnd = ta.selectionEnd;
       const r = refine(value.substring(selectionStart, selectionEnd));
       if (!r) return;
-      const meanings =
+      ta.value =
          value.substring(0, selectionStart) + r + value.substring(selectionEnd);
-      props.onMeaningsChange?.(meanings.split("\n"));
+      ta.dispatchEvent(new Event("input"));
       taSelect(selectionStart, selectionStart + r.length);
    };
    const handleBIClick = (tag: "b" | "i" | "t") => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      const meanings =
+      ta.value =
          value.substring(0, selectionStart) +
          `<${tag}>` +
          value.substring(selectionStart, selectionEnd) +
          `</${tag}>` +
          value.substring(selectionEnd);
-      props.onMeaningsChange?.(meanings.split("\n"));
+      ta.dispatchEvent(new Event("input"));
       const l = tag.length + 2;
       taSelect(selectionStart + l, selectionEnd + l);
    };
@@ -56,38 +56,38 @@ export default (
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      const meanings =
+      ta.value =
          value.substring(0, selectionStart) +
          patenheses[0] +
          value.substring(selectionStart, selectionEnd) +
          patenheses[1] +
          value.substring(selectionEnd);
-      props.onMeaningsChange?.(meanings.split("\n"));
+      ta.dispatchEvent(new Event("input"));
       taSelect(selectionStart + 1, selectionEnd + 1);
    };
    const handleRemoveClick = () => {
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
-      const meanings =
+      ta.value =
          value.substring(0, selectionStart - 1) +
          value.substring(selectionStart, selectionEnd) +
          value.substring(selectionEnd + 1);
-      props.onMeaningsChange?.(meanings.split("\n"));
+      ta.dispatchEvent(new Event("input"));
       taSelect(selectionStart - 1, selectionEnd - 1);
    };
    const handleTransClick = () => {
-      if (!props.entry.meanings) return;
-      const nmeanings: Array<string> = [];
-      for (const meaning of props.entry.meanings) {
+      const nlines: Array<string> = [];
+      for (const line of ta.value) {
          if (
-            (/^[[(<]/.test(meaning) && /[)\]>]$/.test(meaning)) ||
-            meaning.endsWith("</t>")
+            (/^[[(<]/.test(line) && /[)\]>]$/.test(line)) ||
+            line.endsWith("</t>")
          )
-            nmeanings.push(meaning);
-         else nmeanings.push(`${meaning} <t></t>`);
+            nlines.push(line);
+         else nlines.push(`${line} <t></t>`);
       }
-      props.onMeaningsChange?.(nmeanings);
+      ta.value = nlines.join("\n");
+      ta.dispatchEvent(new Event("input"));
    };
    return (
       <div
