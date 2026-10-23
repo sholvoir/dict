@@ -27,6 +27,7 @@ export default (
       ta.setSelectionRange(start, end);
    };
    const handleBIClick = (tag: "b" | "i" | "t") => {
+      if (!ta) return;
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -41,6 +42,7 @@ export default (
       taSelect(selectionStart + l, selectionEnd + l);
    };
    const handleParenthesesClick = (patenheses: "()" | "[]" | '""') => {
+      if (!ta) return;
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -54,6 +56,7 @@ export default (
       taSelect(selectionStart + 1, selectionEnd + 1);
    };
    const handleRemoveClick = () => {
+      if (!ta) return;
       const value = ta.value;
       const selectionStart = ta.selectionStart;
       const selectionEnd = ta.selectionEnd;
@@ -65,6 +68,7 @@ export default (
       taSelect(selectionStart - 1, selectionEnd - 1);
    };
    const handleTransClick = () => {
+      if (!ta) return;
       const nlines: Array<string> = [];
       for (const line of ta.value.split("\n")) {
          if (
