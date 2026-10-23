@@ -41,7 +41,7 @@ export default (
       const l = tag.length + 2;
       taSelect(selectionStart + l, selectionEnd + l);
    };
-   const handleParenthesesClick = (patenheses: "()" | "[]" | '""') => {
+   const handleParenthesesClick = (patenheses: "（）" | "“”") => {
       if (!ta) return;
       const value = ta.value;
       const selectionStart = ta.selectionStart;
@@ -120,21 +120,15 @@ export default (
             </Button>
             <Button
                class={buttonClass}
-               onClick={() => handleParenthesesClick('""')}
+               onClick={() => handleParenthesesClick("“”")}
             >
-               &quot;&quot;
+               “”
             </Button>
             <Button
                class={buttonClass}
-               onClick={() => handleParenthesesClick("()")}
+               onClick={() => handleParenthesesClick("（）")}
             >
-               ()
-            </Button>
-            <Button
-               class={buttonClass}
-               onClick={() => handleParenthesesClick("[]")}
-            >
-               []
+               （）
             </Button>
             <Button class={buttonClass} onClick={() => handleBIClick("b")}>
                B
