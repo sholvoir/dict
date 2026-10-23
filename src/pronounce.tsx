@@ -1,5 +1,5 @@
 import type { IPronounce } from "@sholvoir/dict-server/src/lib/imic";
-import { getWebsterSound } from "@sholvoir/dict-server/src/lib/webster-api";
+import { getWebsterSound } from "@sholvoir/dict-server/src/lib/webster-sound";
 import Button from "@sholvoir/solid-components/button-ripple";
 import type { JSX } from "solid-js";
 
