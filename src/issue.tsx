@@ -74,7 +74,7 @@ export default (props: {
                activeClass="bg-(--bg-title)"
                index={cindex()}
                class="px-2"
-               onItemSelect={(i) => (setCIndex(i), issueSelected)}
+               onItemSelect={(i) => (setCIndex(i), issueSelected())}
                options={issues().map((issue) => issue.issue)}
             />
          </div>

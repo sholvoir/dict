@@ -17,7 +17,7 @@ export default (
          key: keyof IPronounce,
          v: IPronounce[typeof key],
       ) => void;
-      onTopChange?: (t: string) => void;
+      onTopChange?: (t?: string) => void;
       word: string;
    } & JSX.HTMLAttributes<HTMLDivElement>,
 ) => {
@@ -144,8 +144,15 @@ export default (
             <Button class={buttonClass} onClick={handleTransClick}>
                Trans
             </Button>
-            <Button class={buttonClass} onClick={() => props.onTopChange?.("")}>
-               Top
+            <Button
+               class={buttonClass}
+               onClick={() =>
+                  props.onTopChange?.(
+                     props.entry.top === undefined ? "" : undefined,
+                  )
+               }
+            >
+               {props.entry.top === undefined ? "Add Top" : "Remove Top"}
             </Button>
             <Button
                class={buttonClass}
