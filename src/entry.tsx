@@ -9,7 +9,7 @@ export default (
    props: {
       entry: IEntry;
       onDelete: () => void;
-      onMeaningsChange?: (ms: Array<string>) => void;
+      onMeaningsChange?: (ms: string) => void;
       onPosChange?: (p: string) => void;
       onPronouncesChange?: (ps: Array<IPronounce>) => void;
       onPronouncesItemChange?: (
@@ -180,11 +180,9 @@ export default (
             class="h-32 grow font-mono"
             name="meanings"
             onFocus={(e) => (ta = e.currentTarget)}
-            onInput={(e) =>
-               props.onMeaningsChange?.(e.currentTarget.value.split("\n"))
-            }
+            onInput={(e) => props.onMeaningsChange?.(e.currentTarget.value)}
             placeholder="meanings"
-            value={props.entry.meanings?.join("\n")}
+            value={props.entry.meanings}
          />
       </div>
    );
