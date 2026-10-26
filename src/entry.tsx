@@ -1,5 +1,6 @@
 import type { IEntry, IPronounce } from "@sholvoir/dict-server/src/lib/imic";
 import Button from "@sholvoir/solid-components/button-ripple";
+import type { TextAreaTargeted } from "@sholvoir/solid-components/targeted";
 import { For, type JSX, Show } from "solid-js";
 import Pronounce from "./pronounce";
 
@@ -25,6 +26,20 @@ export default (
    const taSelect = (start: number, end: number) => {
       ta.focus();
       ta.setSelectionRange(start, end);
+   };
+   const handleKeyDown = (e: KeyboardEvent & TextAreaTargeted) => {
+      if (e.key === "Tab") {
+         e.preventDefault();
+         e.stopPropagation();
+         const ct = e.currentTarget;
+         const value = ct.value;
+         const start = ct.selectionStart;
+         const end = ct.selectionEnd;
+         ct.value = `${value.substring(0, start)}\t${value.substring(end)}`;
+         ct.dispatchEvent(new Event("input"));
+         ct.focus();
+         ct.selectionStart = ct.selectionEnd = start + 1;
+      }
    };
    const handleBIClick = (tag: "b" | "i" | "t") => {
       if (!ta) return;
@@ -173,6 +188,7 @@ export default (
                rows={1}
                onFocus={(e) => (ta = e.currentTarget)}
                onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
+               onKeyDown={handleKeyDown}
                value={props.entry.top}
             />
          </Show>
