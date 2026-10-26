@@ -41,7 +41,7 @@ export default (
          ct.selectionStart = ct.selectionEnd = start + 1;
       }
    };
-   const handleBIClick = (tag: "b" | "i" | "t") => {
+   const handleBIClick = (tag: "b" | "i") => {
       if (!ta) return;
       const value = ta.value;
       const selectionStart = ta.selectionStart;
@@ -81,20 +81,6 @@ export default (
          value.substring(selectionEnd + 1);
       ta.dispatchEvent(new Event("input"));
       taSelect(selectionStart - 1, selectionEnd - 1);
-   };
-   const handleTransClick = () => {
-      if (!ta) return;
-      const nlines: Array<string> = [];
-      for (const line of ta.value.split("\n")) {
-         if (
-            (/^[[(<]/.test(line) && /[)\]>]$/.test(line)) ||
-            line.endsWith("</t>")
-         )
-            nlines.push(line);
-         else nlines.push(`${line} <t></t>`);
-      }
-      ta.value = nlines.join("\n");
-      ta.dispatchEvent(new Event("input"));
    };
    return (
       <div
@@ -151,12 +137,6 @@ export default (
             <Button class={buttonClass} onClick={() => handleBIClick("i")}>
                I
             </Button>
-            <Button class={buttonClass} onClick={() => handleBIClick("t")}>
-               T
-            </Button>
-            <Button class={buttonClass} onClick={handleTransClick}>
-               Trans
-            </Button>
             <Button
                class={buttonClass}
                onClick={() =>
@@ -185,10 +165,10 @@ export default (
          </div>
          <Show when={props.entry.top !== undefined}>
             <textarea
-               rows={1}
                onFocus={(e) => (ta = e.currentTarget)}
                onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
                onKeyDown={handleKeyDown}
+               rows={1}
                value={props.entry.top}
             />
          </Show>
@@ -197,6 +177,7 @@ export default (
             name="meanings"
             onFocus={(e) => (ta = e.currentTarget)}
             onInput={(e) => props.onMeaningsChange?.(e.currentTarget.value)}
+            onKeyDown={handleKeyDown}
             placeholder="meanings"
             value={props.entry.meanings}
          />
