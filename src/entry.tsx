@@ -28,47 +28,44 @@ export default (
       ta.setSelectionRange(start, end);
    };
    const handleKeyDown = (e: KeyboardEvent & TextAreaTargeted) => {
-      if (e.key === "Tab") {
-         e.preventDefault();
-         e.stopPropagation();
-         const ct = e.currentTarget;
-         const value = ct.value;
-         const start = ct.selectionStart;
-         const end = ct.selectionEnd;
-         ct.value = `${value.substring(0, start)}\t${value.substring(end)}`;
-         ct.dispatchEvent(new Event("input"));
-         ct.focus();
-         ct.selectionStart = ct.selectionEnd = start + 1;
-      }
+      if (e.key !== "Tab") return;
+      if (!ta) return;
+      e.preventDefault();
+      const value = ta.value;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      ta.value = `${value.substring(0, start)}\t${value.substring(end)}`;
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+      taSelect(start + 1, start + 1);
    };
    const handleBIClick = (tag: "b" | "i") => {
       if (!ta) return;
       const value = ta.value;
-      const selectionStart = ta.selectionStart;
-      const selectionEnd = ta.selectionEnd;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
       ta.value =
-         value.substring(0, selectionStart) +
+         value.substring(0, start) +
          `<${tag}>` +
-         value.substring(selectionStart, selectionEnd) +
+         value.substring(start, end) +
          `</${tag}>` +
-         value.substring(selectionEnd);
-      ta.dispatchEvent(new Event("input"));
+         value.substring(end);
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
       const l = tag.length + 2;
-      taSelect(selectionStart + l, selectionEnd + l);
+      taSelect(start + l, end + l);
    };
    const handleParenthesesClick = (patenheses: "（）" | "“”") => {
       if (!ta) return;
       const value = ta.value;
-      const selectionStart = ta.selectionStart;
-      const selectionEnd = ta.selectionEnd;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
       ta.value =
-         value.substring(0, selectionStart) +
+         value.substring(0, start) +
          patenheses[0] +
-         value.substring(selectionStart, selectionEnd) +
+         value.substring(start, end) +
          patenheses[1] +
-         value.substring(selectionEnd);
-      ta.dispatchEvent(new Event("input"));
-      taSelect(selectionStart + 1, selectionEnd + 1);
+         value.substring(end);
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+      taSelect(start + 1, end + 1);
    };
    const handleRemoveClick = () => {
       if (!ta) return;
@@ -79,7 +76,7 @@ export default (
          value.substring(0, selectionStart - 1) +
          value.substring(selectionStart, selectionEnd) +
          value.substring(selectionEnd + 1);
-      ta.dispatchEvent(new Event("input"));
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
       taSelect(selectionStart - 1, selectionEnd - 1);
    };
    return (
@@ -165,6 +162,7 @@ export default (
          </div>
          <Show when={props.entry.top !== undefined}>
             <textarea
+               name="top"
                onFocus={(e) => (ta = e.currentTarget)}
                onInput={(e) => props.onTopChange?.(e.currentTarget.value)}
                onKeyDown={handleKeyDown}
