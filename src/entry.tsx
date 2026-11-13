@@ -67,6 +67,11 @@ export default (
       ta.dispatchEvent(new Event("input", { bubbles: true }));
       taSelect(start + 1, end + 1);
    };
+   const handleTransClick = () => {
+      if (!ta) return;
+      ta.value = `${ta.value.split("\n").join("\t\n")}\t`;
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+   };
    const handleRemoveClick = () => {
       if (!ta) return;
       const value = ta.value;
@@ -133,6 +138,9 @@ export default (
             </Button>
             <Button class={buttonClass} onClick={() => handleBIClick("i")}>
                I
+            </Button>
+            <Button class={buttonClass} onClick={handleTransClick}>
+               Trans
             </Button>
             <Button
                class={buttonClass}
